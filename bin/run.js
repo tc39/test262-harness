@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // Copyright (C) 2014, Microsoft Corporation. All rights reserved.
 // This code is governed by the BSD License found in the LICENSE file.
 
