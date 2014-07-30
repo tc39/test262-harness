@@ -5,6 +5,7 @@
 
 var parser = require('../lib/parser');
 var tapify = require('../lib/tapify');
+var simpleReporter = require('../lib/simpleReporter.js');
 var glob = require('glob');
 var through = require('through');
 var fs = require('fs');
@@ -13,7 +14,7 @@ var jss = require('JSONStream').stringify();
 var args = require('minimist')(process.argv.slice(2), {
     default: {
         runner: 'node',
-        reporter: 'tap',
+        reporter: 'simple',
         threads: 1,
         consolePrintCommand: 'console.log'
     }
@@ -36,6 +37,8 @@ if(args.reporter === 'json') {
     results.pipe(jss).pipe(process.stdout);
 } else if(args.reporter === 'tap') {
     results.pipe(tapify).pipe(process.stdout);
+} else if(args.reporter === 'simple') {
+    results.pipe(simpleReporter);
 }
 
 // Make sure unnamed args are processed as glob patterns, even though unix-based
