@@ -21,6 +21,7 @@ Run chapter 8 tests:
 | --consolePrintCommand | For console runner, sets the command to write to console. Used for reporting errors to the harness.
 | --testStrict | Tests both strict and non-strict mode (note: many tests need fixing for this to work)
 | --reporter | Selects test case result format. Currently either `json` or `tap`. Default `tap`.
+| --prelude | Appends specified file to the top of each test file.
 
 ### Pipeline
 
