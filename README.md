@@ -1,7 +1,7 @@
 ## Test262-Harness
 An experimental Node-based test262 harness. Once this harness has stabilized, I plan to push to include it by default in official test262.
 
-Note that this harness requires the normalized test262 format currently proposed in http://github.com/tc39/test262/pulls/51.
+Note that this harness requires the normalized test262 format currently proposed in <http://github.com/tc39/test262/pull/51>.
 
 ### Running tests
 1. Clone the repository
