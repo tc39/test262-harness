@@ -8,7 +8,7 @@ var tapify = require('../lib/tapify');
 var glob = require('glob');
 var through = require('through');
 var fs = require('fs');
-var jss = require('JSONStream').stringify()
+var jss = require('JSONStream').stringify();
 
 var args = require('minimist')(process.argv.slice(2), {
     default: {
@@ -28,7 +28,25 @@ try {
     throw e;
 }
 
-glob(args._[0], function (err, files) {
+var runner = new Runner(args);
+var results = parser
+    .pipe(runner.getStreamingCompiler());
+
+if(args.reporter === 'json') {
+    results.pipe(jss).pipe(process.stdout);
+} else if(args.reporter === 'tap') {
+    results.pipe(tapify).pipe(process.stdout);
+}
+
+// Make sure unnamed args are processed as glob patterns, even though unix-based
+// system will auto-expand glob pattern args.
+var files = args._.reduce(function (files, pattern) {
+    return files.concat(glob.sync(pattern));
+}, []);
+
+processFiles(files);
+
+function processFiles(files) {
     var index = -1;
 
     function nextFile() {
@@ -43,19 +61,9 @@ glob(args._[0], function (err, files) {
     nextFile();
 
     function processFile(file, cb) {
-        fs.readFile(file, 'utf-8', function(err, contents) {
+        fs.readFile(file, 'utf8', function(err, contents) {
             parser.write({file: file, contents: contents});
             cb();
         });
     }
-});
-
-var runner = new Runner(args);
-var results = parser
-    .pipe(runner.getStreamingCompiler());
-
-if(args.reporter === 'json') {
-    results.pipe(jss).pipe(process.stdout);
-} else if(args.reporter === 'tap') {
-    results.pipe(tapify).pipe(process.stdout);
 }
