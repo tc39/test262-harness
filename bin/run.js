@@ -17,7 +17,8 @@ var args = require('minimist')(process.argv.slice(2), {
         reporter: 'simple',
         threads: 1,
         consolePrintCommand: 'console.log'
-    }
+    }, 
+    boolean: true
 });
 
 // Try to create our runner
