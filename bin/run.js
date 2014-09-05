@@ -3,7 +3,7 @@
 // Copyright (C) 2014, Microsoft Corporation. All rights reserved.
 // This code is governed by the BSD License found in the LICENSE file.
 
-var parser = require('../lib/parser');
+var parser = require('test262-parser');
 var tapify = require('../lib/tapify');
 var simpleReporter = require('../lib/simpleReporter.js');
 var glob = require('glob');

@@ -7,13 +7,18 @@
     "test262-harness": "bin/run.js"
   },
   "dependencies": {
-    "glob": "~4.0.3",
-    "js-yaml": "~3.1.0",
-    "through": "~2.3.4",
-    "tap": "~0.4.11",
+    "JSONStream": "^0.8.4",
+    "argparse": "^0.1.15",
     "duplexer": "^0.1.1",
+    "esprima": "^1.0.4",
+    "glob": "~4.0.3",
+    "inherits": "^2.0.1",
+    "lru-cache": "^2.5.0",
     "minimist": "^0.2.0",
-    "JSONStream": "^0.8.4"
+    "sigmund": "^1.0.0",
+    "tap": "~0.4.11",
+    "test262-parser": "^1.0.1",
+    "through": "~2.3.4"
   },
   "author": "Brian Terlson",
   "license": "BSD"
