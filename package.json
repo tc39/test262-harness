@@ -13,7 +13,8 @@
     "tap": "~0.4.11",
     "duplexer": "^0.1.1",
     "minimist": "^0.2.0",
-    "JSONStream": "^0.8.4"
+    "JSONStream": "^0.8.4",
+    "test262-parser": "^1.1.0"
   },
   "author": "Brian Terlson",
   "license": "BSD"
