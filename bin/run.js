@@ -105,7 +105,7 @@ function throughThreaded(cb, threads) {
         });
     }, function() {
         done = true;
-        if(this.pending === 0) {
+        if(pending === 0) {
             this.queue(null);
         }
     })
