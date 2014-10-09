@@ -10,6 +10,7 @@ var glob = require('glob');
 var through = require('through');
 var fs = require('fs');
 var jss = require('JSONStream').stringify();
+var scenarios = require('../lib/scenarios');
 
 var args = require('minimist')(process.argv.slice(2), {
     default: {
@@ -31,7 +32,10 @@ try {
 
 var runner = new Runner(args);
 var results = parser
-    .pipe(runner.getStreamingCompiler());
+    .pipe(through(flatMap(scenarios(args))))
+    .pipe(throughThreaded(function(test, done) {
+        runner.run(test, done);
+    }, args.threads));
 
 if(args.reporter === 'json') {
     results.pipe(jss).pipe(process.stdout);
@@ -69,4 +73,40 @@ function processFiles(files) {
             cb();
         });
     }
+}
+
+function flatMap(iterFn) {
+    return function (test) {
+        var iter = iterFn(test);
+        var val = iter.next();
+
+        while(!val.done) {
+            this.queue(val.value);
+            val = iter.next();
+        }
+    }
+}
+
+function throughThreaded(cb, threads) {
+    var pending = 0;
+    var done = false;
+
+    return through(function(data) {
+        var that = this;
+        pending++;
+
+        if(pending >= threads) that.pause();
+
+        cb(data, function() {
+            that.queue(data);
+            pending--;
+            if(done && pending === 0) that.queue(null);
+            if(pending < threads && that.paused) that.resume();
+        });
+    }, function() {
+        done = true;
+        if(this.pending === 0) {
+            this.queue(null);
+        }
+    })
 }
