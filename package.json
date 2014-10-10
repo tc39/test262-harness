@@ -1,6 +1,6 @@
 {
   "name": "test262-harness",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "Node-based harness for test262",
   "main": "index.js",
   "bin": {
@@ -8,14 +8,9 @@
   },
   "dependencies": {
     "JSONStream": "^0.8.4",
-    "argparse": "^0.1.15",
     "duplexer": "^0.1.1",
-    "esprima": "^1.0.4",
     "glob": "~4.0.3",
-    "inherits": "^2.0.1",
-    "lru-cache": "^2.5.0",
     "minimist": "^0.2.0",
-    "sigmund": "^1.0.0",
     "tap": "~0.4.11",
     "test262-parser": "^1.0.2",
     "through": "~2.3.4"
