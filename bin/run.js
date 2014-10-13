@@ -18,8 +18,20 @@ var args = require('minimist')(process.argv.slice(2), {
         reporter: 'simple',
         threads: 1,
         consolePrintCommand: 'console.log'
+    },
+    alias: {
+        consoleCommand: 'e',
+        consolePrintCommand: 'p',
+        runner: 'r',
+        reporter: 'R',
+        threads: 't',
     }
 });
+
+// default to console runner if passing console command
+if(args.consoleCommand && args.runner === 'node') {
+    args.runner = 'console';
+}
 
 // Try to create our runner
 var Runner;
