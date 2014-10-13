@@ -12,7 +12,9 @@ Note that this harness requires the normalized test262 format currently proposed
 Run chapter 8 tests:
 
 `> test262-harness ../test262/test/suite/ch08/**/*.js`
+
 `> test262-harness -e jsshell/js -p print ./tests`
+
 `> test262-harness --prelude promise.js ./tests/es6/ch25/**/*.js`
 
 #### Options
