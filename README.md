@@ -13,9 +13,10 @@ Run chapter 8 tests:
 
 `> test262-harness ../test262/test/suite/ch08/**/*.js`
 
-`> test262-harness -e jsshell/js -p print ./tests`
+`> test262-harness -r jsshell -e jsshell/js -b ./tests`
 
 `> test262-harness --prelude promise.js ./tests/es6/ch25/**/*.js`
+
 
 #### Options
 | Name    | Action      |
@@ -24,6 +25,7 @@ Run chapter 8 tests:
 | -e, --consoleCommand | For console runner, sets the command to invoke. Must be in PATH.
 | -p, --consolePrintCommand | For console runner, sets the command to write to console. Used for reporting errors to the harness.
 | -t, --threads | Run this many tests in parallel.
+| -b, --batch | How many tests to batch together. Only supported by some runners (currently just jsshell)
 | --testStrict | Tests both strict and non-strict mode (note: many tests need fixing for this to work)
 | -R, --reporter | Selects test case result format. Currently either `json`, `tap`, or `simple`. Default `simple`.
 | --prelude | Appends specified file to the top of each test file.
