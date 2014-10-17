@@ -17,7 +17,6 @@ var args = require('minimist')(process.argv.slice(2), {
         runner: 'node',
         reporter: 'simple',
         threads: 1,
-        consolePrintCommand: 'console.log'
     },
     alias: {
         consoleCommand: 'e',
