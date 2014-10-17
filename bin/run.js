@@ -24,6 +24,7 @@ var args = require('minimist')(process.argv.slice(2), {
         runner: 'r',
         reporter: 'R',
         threads: 't',
+        batch: 'b'
     }
 });
 
@@ -42,11 +43,53 @@ try {
 }
 
 var runner = new Runner(args);
+
+// Run tests
 var results = parser
-    .pipe(through(flatMap(scenarios(args))))
-    .pipe(throughThreaded(function(test, done) {
-        runner.run(test, done);
-    }, args.threads));
+    .pipe(through(flatMap(scenarios(args))));
+
+if(args.batch) {
+    results = results
+        .pipe(batch(args.batch))
+        .pipe(throughThreaded(runBatch, args.threads));
+} else {
+    results = results
+        .pipe(throughThreaded(runTest, args.threads));
+}
+
+function batch(size) {
+    var currentBatch = [];
+
+    return through(function(data) {
+        currentBatch.push(data);
+
+        if(currentBatch.length === size) {
+            this.queue(currentBatch);
+            currentBatch = [];
+        }
+    }, function(done) {
+        this.queue(currentBatch);
+        this.queue(null);
+    });
+}
+
+function runTest(test, done) {
+    var stream = this;
+    runner.run(test, function() {
+        stream.queue(test);
+        done();
+    });
+}
+
+function runBatch(batch, done) {
+    var stream = this;
+    runner.runBatch(batch, function() {
+        batch.forEach(stream.queue);
+        done();
+    });
+}
+
+
 
 if(args.reporter === 'json') {
     results.pipe(jss).pipe(process.stdout);
@@ -108,8 +151,7 @@ function throughThreaded(cb, threads) {
 
         if(pending >= threads) that.pause();
 
-        cb(data, function() {
-            that.queue(data);
+        cb.call(this, data, function() {
             pending--;
             if(done && pending === 0) that.queue(null);
             if(pending < threads && that.paused) that.resume();
