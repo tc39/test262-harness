@@ -32,7 +32,18 @@ var Tributary = require('stream-bifurcate')
 var scenarios = require('../lib/scenarios');
 var readFile = _.wrapCallback(fs.readFile);
 var DEFAULT_BATCH_SIZE = 75;
+
+if(args.config) {
+    require(path.join(process.cwd(), args.config));
+}
+
+var t262 = require('../index')
+console.log(t262.config);
+
+console.log()
+
 var Runner = loadRunner();
+console.log(Runner);
 
 // default to console runner if passing console command
 if(args.consoleCommand && args.runner === 'node') {
@@ -121,6 +132,8 @@ function scenarioStream(test) {
 
 // Load the runner
 function loadRunner() {
+    if(t262.config.runner) return t262.config.runner;
+
     try {
         return require('../lib/runners/' + args.runner);
     } catch(e) {
