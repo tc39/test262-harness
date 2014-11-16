@@ -10,3 +10,26 @@ exports.useConfig = function(conf) {
         config[k] = conf[k];
     })
 }
+
+exports.loadRunner = function loadRunner() {
+    if(typeof config.runner === 'string')
+        return requireRunner(config.runner);
+
+    if(typeof config.runner === 'function')
+        return config.runner;
+
+    if(config.consoleCommand)
+        return requireRunner('console')
+
+    return requireRunner('node');
+}
+
+function requireRunner(name) {
+    try {
+        return require('./lib/runners/' + name);
+    } catch(e) {
+        if(e.code === 'MODULE_NOT_FOUND')
+            throw new Error('Runner ' + name + ' not found.');
+        throw e;
+    }
+}
