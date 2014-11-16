@@ -73,7 +73,7 @@ if(t262.config.reporter === 'json') {
 function run(tests) {
     var runner = new Runner(t262.config);
 
-    return _(tests).map(function(test) {
+    var results = _(tests).map(function(test) {
         return _(function(push) {
             if(t262.config.batch) {
                 runner.runBatch(test, function() {
@@ -90,6 +90,12 @@ function run(tests) {
             }
         });
     }).sequence();
+
+    results.on('end', function() {
+        runner.end();
+    });
+
+    return results;
 }
 
 // takes a file path and returns a stream of filenames
