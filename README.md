@@ -2,8 +2,8 @@
 An experimental Node-based test262 harness. Once this harness has stabilized, I plan to push to include it by default in official test262.
 
 ## Quick Start
-1. `npm install -g test262-harness`
-2. `test262-harness glob/of/test262/files/to/run`
+1. `npm install test262-harness`
+2. `./node_modules/.bin/test262-harness glob/of/test262/tests/to/run`
 
 If you need the official test262 collateral:
 
