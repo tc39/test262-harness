@@ -43,7 +43,7 @@ These options may be passed on the command line or passed to useConfig in your c
 You can store configuration options or implement a custom runner in a config file. For example, given the following `t262.js` file:
 
 ```javascript
-var t262 = require('test262-harness');`
+var t262 = require('test262-harness');
 t262.useConfig({
     batch: 50,
     consoleCommand: 'js.exe',
