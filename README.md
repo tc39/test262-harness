@@ -12,7 +12,7 @@ If you need the official test262 collateral:
 ### Examples
 Run chapter 8 tests in the default runner (Node):
 
-`> test262-harness ../test262/test/suite/ch08/**/*.js`
+`> test262-harness "../test262/test/suite/ch08/**/*.js"`
 
 Run local tests in jsshell:
 
@@ -20,7 +20,7 @@ Run local tests in jsshell:
 
 Run promise tests on a promise polyfill:
 
-`> test262-harness --prelude promise.js ./tests/es6/ch25/**/*.js`
+`> test262-harness --prelude promise.js "./tests/es6/ch25/**/*.js"`
 
 
 ## Options
