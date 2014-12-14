@@ -56,9 +56,6 @@ var results = _(function(push) {
     push(null, _.nil);
 }).merge();
 
-results.on('end', function() {
-    console.log("Took " + ((Date.now() - start) / 1000) + " seconds");
-})
 
 if(t262.config.reporter === 'json') {
     results.pipe(jss).pipe(process.stdout);
@@ -66,6 +63,10 @@ if(t262.config.reporter === 'json') {
     results.pipe(tapify).pipe(process.stdout);
 } else if(t262.config.reporter === 'simple') {
     results.pipe(simpleReporter);
+
+    results.on('end', function() {
+        console.log("Took " + ((Date.now() - start) / 1000) + " seconds");
+    })
 }
 
 // takes a test collateral stream.
