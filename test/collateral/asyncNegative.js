@@ -3,6 +3,6 @@ description: Async test
 negative: RangeError
 ---*/
 
-Promise.resolve().then(function() {
+process.nextTick(function() {
     $DONE(new RangeError());
-})
+});

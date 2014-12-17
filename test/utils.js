@@ -1,0 +1,77 @@
+var path = require('path');
+var cp = require('child_process');
+var test = require('tape');
+
+function resultsForTest(results, test) {
+    for(var i = 0; i < results.length; i++) {
+        if(test.file === results[i].file &&
+           !!test.strictMode === !!results[i].strictMode) {
+            return results[i];
+        }
+    }
+
+    throw "Can't find results for " + test.file;
+}
+
+function expectedString(exp) {
+    var str = exp.file + " ";
+    
+    if(exp.pass) str += "passes";
+    else str += "fails";
+
+    if(exp.strictMode) str += " in strict mode";
+
+    return str;
+}
+
+/**
+ * Creates a test that ensures the harness runs tests without error and that the tests
+ * pass or fail as expected.
+ * @param {string} args Arguments to pass to the harness. Does not handle quoted strings.
+ * @param {result[]} expectedResults expected pass results for the tests.
+ */
+exports.testResultsCorrect = function testResultsCorrect(args, expectedResults) {
+    test(args, function(t) {
+        exports.run(args, function(res, stderr) {
+            t.equal(stderr, "", "No stderr is present");
+            t.equal(res.length, expectedResults.length, expectedResults.length + " tests run");
+            expectedResults.forEach(function(exp) {
+                var act = resultsForTest(res, exp);
+                t.equal(exp.pass, act.pass, expectedString(exp));
+
+            });
+            t.end();
+        });
+    });
+}
+
+
+/**
+ * @callback runCallback
+ * @param {Array} results Test results taken from JSON logger..
+ * @param {string} stderr Text written to stderr.
+ */
+
+/**
+ * Runs test262-harness with the specified arguments.
+ * @param {string} args Arguments to pass to the harness. Does not handle quoted strings.
+ * @param {runCallback} done
+ */
+exports.run = function run(args, done) {
+    var stdout = '';
+    var stderr = '';
+    args = args.split(" ").concat('--reporter', 'json','test/collateral/*.js');
+
+    var child = cp.fork('bin/run.js', args, {silent: true})
+    child.stdout.on('data', function(d) { stdout += d });
+    child.stderr.on('data', function(d) { stderr += d });
+    child.on('exit', function() {
+        try {
+            var parsed = JSON.parse(stdout);
+        } catch(e) {
+            parsed = [];
+        }
+
+        done(parsed, stderr);
+    })
+}
