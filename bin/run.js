@@ -11,7 +11,9 @@ var args = require('minimist')(process.argv.slice(2), {
         reporter: 'R',
         threads: 't',
         batch: 'b',
-        config: 'c'
+        config: 'c',
+        compile: 'C',
+        outputDir: 'o'
     }
 });
 
@@ -38,6 +40,10 @@ var Runner = t262.loadRunner();
 if(t262.config.batch === true) t262.config.batch = DEFAULT_BATCH_SIZE;
 if(!t262.config.threads) t262.config.threads = 4;
 if(!t262.config.reporter) t262.config.reporter = 'simple';
+if(t262.config.compile === true) t262.config.compile = 'all';
+if(!t262.config.outputDir && t262.config.compile)
+    throw 'need output directory for compiled collateral';
+if(t262.config.compile && !fs.existsSync(t262.config.outputDir)) fs.mkdirSync(t262.config.outputDir);
 
 var start = Date.now();
 
@@ -56,6 +62,35 @@ var results = _(function(push) {
     push(null, _.nil);
 }).merge();
 
+
+if(t262.config.compile) {
+    optionsCopy = shallowCopy(t262.config);
+    optionsCopy.batch = false;
+    optionsCopy.compileOnly = true;
+    var compiler = new Runner(optionsCopy);
+
+    _(results).observe().each(function(test) {
+        var compile = t262.config.compile === 'failures' && !test.pass;
+        compile = compile || t262.config.compile === 'all';
+        compile = compile || t262.config.compile === 'passes' && !!test.pass
+
+        if(compile) {
+            var testCopy = shallowCopy(test);
+            compiler.compile(testCopy)
+            var startPath = path.join(process.cwd(), t262.config.outputDir, path.basename(test.file));
+            var currentPath = startPath;
+            var counter = 0;
+            while(fs.existsSync(currentPath)) {
+                currentPath = startPath.replace(/.js$/, "-" + counter++ + ".js");
+            }
+            fs.writeFile(currentPath, testCopy.contents.replace(/\r\n/g, '\n'));
+        }
+    });
+
+    results.on('end', function() {
+        compiler.end();
+    });
+}
 
 if(t262.config.reporter === 'json') {
     results.pipe(jss).pipe(process.stdout);
@@ -121,4 +156,10 @@ function scenarioStream(test) {
 
         push(null, _.nil);
     })
+}
+
+function shallowCopy(obj) {
+    return Object.keys(obj).reduce(function(v, k) {
+        return v[k] = obj[k], v;
+    }, {});
 }

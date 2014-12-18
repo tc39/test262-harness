@@ -30,6 +30,8 @@ These options may be passed on the command line or passed to useConfig in your c
 |------------|---------------|
 | -r, --runner | Selects a runner to use. Currently available are `node`, `node-ip`, `jsshell`, and `console`. Config files may also pass a runner constructor whose instances implement the runner API described below.
 | -c, --config | Load a config.js file
+| -C, --compile | Save compiled tests so they can be run directly in the host without the harness. Can specify either "all" or "failures". Default is "all".
+| -o, --output | Output directory for compiled test collateral
 | -e, --consoleCommand | For console runner, sets the command to invoke. Must be in PATH.
 | -p, --consolePrintCommand | For console runner, sets the command to write to console. Used for reporting errors to the harness.
 | -t, --threads | Run this many tests in parallel.
@@ -64,6 +66,9 @@ Different runners may execute tests in different ways. The two basic methods are
 | in-proc node | `node-ip` | Runs the test in the current process using vm.runInNewContext.
 | console | `console` | Runs tests out-of-proc in a generic console host. Works with Node, JSShell, and probably others. You will have to provide -p for normal mode runs (defaults to console.log). Can enable batch mode behavior by providing the createEnv and runBatched configuration options.
 | jsshell | `jsshell` | Subclass of the console runner with defaults for jsshell
+
+## Debugging Test Failures
+Because test262-harness makes significant modifications to a test before ultimately running it, even stack traces are little help when debugging test262 failures. In these cases, the --compile flag is your friend. By passing "--compile failures -o output" to the harness, fully compiled failing tests will be written to disk under the output directory. You can run these files directly in the host you are testing.
 
 ## API
 

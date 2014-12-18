@@ -30,6 +30,7 @@
     "test"
   ],
   "devDependencies": {
+    "rimraf": "^2.2.8",
     "tape": "^3.0.3"
   }
 }
