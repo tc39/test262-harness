@@ -37,8 +37,17 @@ exports.testResultsCorrect = function testResultsCorrect(args, expectedResults) 
             t.equal(res.length, expectedResults.length, expectedResults.length + " tests run");
             expectedResults.forEach(function(exp) {
                 var act = resultsForTest(res, exp);
-                t.equal(exp.pass, act.pass, expectedString(exp));
+                t.equal(act.pass, exp.pass, expectedString(exp));
 
+                if(!exp.pass) {
+                    // validate error message and such
+                    t.equal(act.errorName, exp.errorName, "Error name is " + exp.errorName);
+                    t.equal(act.errorMessage, exp.errorMessage, "Error message is " + exp.errorMessage);
+
+                    if(exp.topOfStack) {
+                        t.ok(act.errorStack.indexOf(exp.topOfStack) > -1, "Stack contains " + exp.topOfStack);
+                    }
+                }
             });
             t.end();
         });

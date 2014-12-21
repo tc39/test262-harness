@@ -19,18 +19,21 @@ runners.forEach(function(runner) {
     utils.testResultsCorrect(runner, expected.noTestStrict);
     utils.testResultsCorrect(runner + ' --testStrict', expected);
     test("compiling failures: " + runner + " -C failures -o testOutput", function(t) {
-        t.plan(1);
+        t.plan(2);
         utils.run(runner + " -C failures -o testOutput", function(res, stderr) {
             t.ok(fs.existsSync('./testOutput/error.js'), 'testOutput/error.js exists');
+            t.ok(fs.existsSync('./testOutput/thrownError.js'), 'testOutput/thrownError.js exists');
             rimraf.sync('./testOutput');
         });
     });
 
     test("compiling failures: " + runner + " -C failures -o testOutput --testStrict", function(t) {
-        t.plan(2);
+        t.plan(4);
         utils.run(runner + " -C failures -o testOutput --testStrict", function(res, stderr) {
             t.ok(fs.existsSync('./testOutput/error.js'), 'testOutput/error.js exists');
             t.ok(fs.existsSync('./testOutput/error-0.js'), 'testOutput/error-0.js exists');
+            t.ok(fs.existsSync('./testOutput/thrownError.js'), 'testOutput/thrownError.js exists');
+            t.ok(fs.existsSync('./testOutput/thrownError-0.js'), 'testOutput/thrownError-0.js exists');
             rimraf.sync('./testOutput');
         });
     });
@@ -86,4 +89,3 @@ test('compile flag throws without output directory', function(t) {
         rimraf.sync('./testOutput');
     });
 });
-
