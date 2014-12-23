@@ -39,6 +39,9 @@ runners.forEach(function(runner) {
     });
 });
 
+// test exclusion
+utils.testResultsCorrect('-c test/excludeConfig.js', expected.excludeAB);
+
 // batch mode supported by console runner
 utils.testResultsCorrect('-r console -e node -b 5 -c test/nodeConfig.js', expected.noTestStrict);
 utils.testResultsCorrect('-r console -e node -b 5 --testStrict -c test/nodeConfig.js', expected);

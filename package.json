@@ -19,7 +19,8 @@
     "stream-bifurcate": "^1.0.0",
     "tap": "~0.4.11",
     "test262-parser": "^1.0.2",
-    "through": "~2.3.4"
+    "through": "~2.3.4",
+    "minimatch": "~2.0.1"
   },
   "author": "Brian Terlson",
   "license": "BSD",
