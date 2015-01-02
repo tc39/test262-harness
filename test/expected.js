@@ -20,4 +20,10 @@ all.noTestStrict = all.filter(function(t) {
     return seen[t.file] = true;
 })
 
+// non-strict test results excluding tests starting with a or b
+all.excludeAB = all.noTestStrict.filter(function(t) {
+    return (t.file.indexOf('test/collateral/a') *
+        t.file.indexOf('test/collateral/b') != 0)
+})
+
 module.exports = all;

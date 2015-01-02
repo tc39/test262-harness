@@ -55,6 +55,14 @@ t262.useConfig({
 
 the command `test262-harness -c t262.js ../test262/test/suite/**/*.js` will run all of test262 in jsshell.
 
+You may also pass in an array of test globs you wish to exclude from running under 'exclude' property in config. For example, this will exclude all tests in chapter 8 from running:
+
+```javascript
+t262.useConfig({
+    exclude: ["../test262/test/suite/ch08/**/*.js"]
+})
+```
+
 ## Runners
 This harness is capable of running tests out of the box on a number of different hosts. Today these include Node, jsshell, and generic console hosts. You can also subclass any of these runners to provide custom behavior, for example to support transpilation tools. See the Runner API below for more details on how to do this.
 

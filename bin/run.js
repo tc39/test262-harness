@@ -30,6 +30,7 @@ var scenarios = require('../lib/scenarios');
 var readFile = _.wrapCallback(fs.readFile);
 var DEFAULT_BATCH_SIZE = 75;
 var t262 = require('../index');
+var minimatch = require('minimatch');
 
 if(args.config) require(path.join(process.cwd(), args.config));
 t262.useConfig(args);
@@ -48,6 +49,7 @@ if(t262.config.compile && !fs.existsSync(t262.config.outputDir)) fs.mkdirSync(t2
 var start = Date.now();
 
 var files = _(t262.config._.map(globStream)).merge();
+if (t262.config.exclude) files = files.filter(exclude);
 var contents = files.fork().map(readFile).sequence();
 var tests = contents.zip(files.fork()).map(function(d) {
     return parser.parseFile({ contents: d[0].toString('utf8'), file: d[1]});
@@ -162,4 +164,16 @@ function shallowCopy(obj) {
     return Object.keys(obj).reduce(function(v, k) {
         return v[k] = obj[k], v;
     }, {});
+}
+
+// exclude tests specified in config
+function exclude(test) {
+    var f = true;
+    for (var i = 0; i<t262.config.exclude.length; i++) {
+        if (minimatch(test, t262.config.exclude[i])) {
+            f = false;
+            break;
+        }
+    }
+    return f;
 }
