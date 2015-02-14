@@ -3,7 +3,8 @@ description: infinite loop test
 negative: /imeout/
 ---*/
 
-for(;;) {}
+if (0) {
+  // causes test to be detected as async
+  $DONE();
+}
 
-// should cause a timeout
-$DONE();
