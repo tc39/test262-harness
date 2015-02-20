@@ -13,7 +13,9 @@ var args = require('minimist')(process.argv.slice(2), {
         batch: 'b',
         config: 'c',
         compile: 'C',
-        outputDir: 'o'
+        outputDir: 'o',
+        help: 'h',
+        version: 'v'
     }
 });
 
@@ -34,6 +36,9 @@ var minimatch = require('minimatch');
 
 if(args.config) require(path.join(process.cwd(), args.config));
 t262.useConfig(args);
+
+if(t262.config.version) return printVersion();
+if(t262.config.help) return printHelp();
 
 var Runner = t262.loadRunner();
 
@@ -177,3 +182,32 @@ function exclude(test) {
     }
     return f;
 }
+
+function printVersion() {
+    var p = require(path.resolve(__dirname, "..", "package.json"));
+    console.log("test262-harness v" + p.version);
+}
+
+function printHelp() {
+
+    printVersion();
+
+    console.log("Usage: test262-harness [options] [files]");
+    console.log("");
+    console.log("Options:");
+    console.log(" -r, --runner               Specify runner (node, node-ip, jsshell, console)");
+    console.log(" -c, --config               Load a config.js file");
+    console.log(" -C, --compile              Save compiled tests.");
+    console.log(" -o, --output               Output directory for compiled tests.");
+    console.log(" -e, --consoleCommand       Command for console runner.");
+    console.log(" -p, --consolePrintCommand  Print command.");
+    console.log(" -t, --threads              Run this many tests in parallel.");
+    console.log(" -b, --batch                How many tests to batch together.");
+    console.log(" --testStrict               Tests both strict and non-strict mode.");
+    console.log(" -R, --reporter             Specify reporter (json, tap, simple).");
+    console.log(" --prelude                  Prepends specified file to each test file.");
+    console.log(" -v, --version              Print test262-harness version.");
+    console.log(" -h, --help                 Print short help.");
+
+}
+
