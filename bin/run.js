@@ -34,93 +34,73 @@ var readFile = _.wrapCallback(fs.readFile);
 var DEFAULT_BATCH_SIZE = 75;
 var t262 = require('../index');
 var minimatch = require('minimatch');
+var Liftoff = require('liftoff');
+var cli = new Liftoff({ name: 'test262-harness'})
 
-if(args.config) require(path.join(process.cwd(), args.config));
-t262.useConfig(args);
+if(args.version) return printVersion();
+if(args.help) return printHelp();
 
-if(t262.config.version) return printVersion();
-if(t262.config.help) return printHelp();
+cli.launch({
+    cwd: args.cwd,
+    configPath: args.config
+}, function(env) {
+    var t262 = initEnv(env);
 
-var Runner = t262.loadRunner();
-
-// apply defaults
-if(t262.config.batch === true) t262.config.batch = DEFAULT_BATCH_SIZE;
-if(!t262.config.threads) t262.config.threads = 4;
-if(!t262.config.reporter) t262.config.reporter = 'simple';
-if(t262.config.compile === true) t262.config.compile = 'all';
-if(!t262.config.outputDir && t262.config.compile)
-    throw 'need output directory for compiled collateral';
-if(t262.config.compile && !fs.existsSync(t262.config.outputDir)) fs.mkdirSync(t262.config.outputDir);
-
-if(!t262.config.includesDir) {
-    if(t262.config.test262Dir) {
-        // relative to test262dir
-        t262.config.includesDir = path.join(t262.config.test262Dir, 'harness');
-    } else {
-        var fromGlob = includesDirFromGlob(t262.config._[0]);
-
-        if(fromGlob) {
-            t262.config.includesDir = fromGlob;
-        } else if(fs.existsSync('harness/')) {
-            // harness dir is present in our cwd
-            t262.config.includesDir = 'harness/';
-        } else {
-            // else fall back to local harness deps
-            t262.config.includesDir = path.join(__dirname, '../lib/helpers/');
-        }
+    // load config file if specified
+    if(env.configPath) {
+        require(env.configPath);
     }
-}
 
-var start = Date.now();
+    // command line flags override anything specified by config files
+    t262.useConfig(args);
 
-var files = t262.config._;
+    applyDefaults(t262.config);
 
-if(t262.config.test262Dir) {
-    files = files.map(function(p) {
-        return path.join(t262.config.test262Dir, 'test', p);
-    })
-}
+    var Runner = t262.loadRunner();
 
-files = _(files.map(globStream)).merge();
+    var files = getFilesStream(t262.config);
+    var contents = files.fork().map(readFile).sequence();
 
-if (t262.config.exclude) files = files.filter(exclude);
+    var start = Date.now();
 
-var contents = files.fork().map(readFile).sequence();
-var tests = contents.zip(files.fork()).map(function(d) {
-    return parser.parseFile({ contents: d[0].toString('utf8'), file: d[1]});
+    var tests = contents.zip(files.fork()).map(function(d) {
+        return parser.parseFile({ contents: d[0].toString('utf8'), file: d[1]});
+    });
+
+    var scenarioStream = getScenarioStream(t262.config);
+    var scenarios = tests.flatMap(scenarioStream);
+
+    if(t262.config.batch) scenarios = _(scenarios).batch(t262.config.batch);
+
+    var trb = scenarios.pipe(new Tributary());
+    var results = _(function(push) {
+        for(var i = 0; i < t262.config.threads; i++) push(null, run(Runner, t262.config, trb.fork()));
+        push(null, _.nil);
+    }).merge();
+
+    if(t262.config.compile) compile(Runner, results);
+
+    if(t262.config.reporter === 'json') {
+        results.pipe(jss).pipe(process.stdout);
+    } else if(t262.config.reporter === 'tap') {
+        results.pipe(tapify).pipe(process.stdout);
+    } else if(t262.config.reporter === 'simple') {
+        results.pipe(simpleReporter);
+
+        results.on('end', function() {
+            console.log("Took " + ((Date.now() - start) / 1000) + " seconds");
+        })
+    }
 });
-var getScenarios = scenarios(t262.config);
-var scenarios = tests.flatMap(scenarioStream);
-if(t262.config.batch) scenarios = _(scenarios).batch(t262.config.batch);
-
-var trb = scenarios.pipe(new Tributary());
-var results = _(function(push) {
-    for(var i = 0; i < t262.config.threads; i++) push(null, run(trb.fork()));
-    push(null, _.nil);
-}).merge();
-
-if(t262.config.compile) compile(results);
-
-if(t262.config.reporter === 'json') {
-    results.pipe(jss).pipe(process.stdout);
-} else if(t262.config.reporter === 'tap') {
-    results.pipe(tapify).pipe(process.stdout);
-} else if(t262.config.reporter === 'simple') {
-    results.pipe(simpleReporter);
-
-    results.on('end', function() {
-        console.log("Took " + ((Date.now() - start) / 1000) + " seconds");
-    })
-}
 
 // takes a test collateral stream.
 // Returns test results stream.
-function run(tests) {
-    var runner = new Runner(t262.config);
+function run(Runner, config, tests) {
+    var runner = new Runner(config);
 
     var results = _(tests).map(function(test) {
         return _(function(push) {
-            if(t262.config.batch) {
+            if(config.batch) {
                 runner.runBatch(test, function() {
                     test.forEach(function(t) {
                         push(null, t);
@@ -154,17 +134,19 @@ function globStream(p) {
 }
 
 // takes a test and returns a stream of all the scenarios
-function scenarioStream(test) {
-    var iter = getScenarios(test);
-    return _(function(push) {
-        var rec = iter.next();
-        while(!rec.done) {
-            push(null, rec.value);
-            rec = iter.next();
-        }
+function getScenarioStream(config) {
+    return function(test) {
+        var iter = scenarios(config)(test);
+        return _(function(push) {
+            var rec = iter.next();
+            while(!rec.done) {
+                push(null, rec.value);
+                rec = iter.next();
+            }
 
-        push(null, _.nil);
-    })
+            push(null, _.nil);
+        })
+    }
 }
 
 function shallowCopy(obj) {
@@ -186,7 +168,7 @@ function exclude(test) {
 }
 
 // dump files to disk based on the compile flag
-function compile(results) {
+function compile(Runner, results) {
     optionsCopy = shallowCopy(t262.config);
     optionsCopy.batch = false;
     optionsCopy.compileOnly = true;
@@ -241,9 +223,75 @@ function includesDirFromGlob(p) {
     }
 }
 
+function initEnv(env) {
+    if(!env.modulePath) {
+        // try loading local module (to support running from test262-harness directory)
+        try {
+            var t262 = require("../index.js");
+            
+            // possibly il-advised sanity check to make sure we're not requiring the index
+            // of some other project.
+            if(!t262.useConfig) throw 1;
+
+            return t262;
+        } catch(e) {
+            console.error("Cannot find local test262-harness install. Run npm install test262-harness.")
+            process.exit(1);
+        }
+    } else {
+        return require(env.modulePath);
+    }
+}
+
+function applyDefaults(config) {
+    if(config.batch === true) config.batch = DEFAULT_BATCH_SIZE;
+    if(!config.threads) config.threads = 4;
+    if(!config.reporter) config.reporter = 'simple';
+    if(config.compile === true) config.compile = 'all';
+    if(!config.outputDir && config.compile)
+        throw 'need output directory for compiled collateral';
+    if(config.compile && !fs.existsSync(config.outputDir)) fs.mkdirSync(config.outputDir);
+
+    if(!config.includesDir) {
+        if(config.test262Dir) {
+            // relative to test262dir
+            config.includesDir = path.join(config.test262Dir, 'harness');
+        } else {
+            var fromGlob = includesDirFromGlob(config._[0]);
+
+            if(fromGlob) {
+                config.includesDir = fromGlob;
+            } else if(fs.existsSync('harness/')) {
+                // harness dir is present in our cwd
+                config.includesDir = 'harness/';
+            } else {
+                // else fall back to local harness deps
+                config.includesDir = path.join(__dirname, '../lib/helpers/');
+            }
+        }
+    }
+}
+
+function getFilesStream(config) {
+    var files = config._;
+
+    if(config.test262Dir) {
+        files = files.map(function(p) {
+            return path.join(config.test262Dir, 'test', p);
+        })
+    }
+
+    files = _(files.map(globStream)).merge();
+
+    if (config.exclude) files = files.filter(exclude);
+
+    return files;
+}
+
 function printVersion() {
     var p = require(path.resolve(__dirname, "..", "package.json"));
     console.log("test262-harness v" + p.version);
+    process.exit(0);
 }
 
 function printHelp() {
@@ -269,5 +317,6 @@ function printHelp() {
     console.log(" -v, --version              Print test262-harness version.");
     console.log(" -h, --help                 Print short help.");
 
+    process.exit(0);
 }
 
