@@ -69,35 +69,7 @@ var results = _(function(push) {
     push(null, _.nil);
 }).merge();
 
-
-if(t262.config.compile) {
-    optionsCopy = shallowCopy(t262.config);
-    optionsCopy.batch = false;
-    optionsCopy.compileOnly = true;
-    var compiler = new Runner(optionsCopy);
-
-    _(results).observe().each(function(test) {
-        var compile = t262.config.compile === 'failures' && !test.pass;
-        compile = compile || t262.config.compile === 'all';
-        compile = compile || t262.config.compile === 'passes' && !!test.pass
-
-        if(compile) {
-            var testCopy = shallowCopy(test);
-            compiler.compile(testCopy)
-            var startPath = path.join(process.cwd(), t262.config.outputDir, path.basename(test.file));
-            var currentPath = startPath;
-            var counter = 0;
-            while(fs.existsSync(currentPath)) {
-                currentPath = startPath.replace(/.js$/, "-" + counter++ + ".js");
-            }
-            fs.writeFile(currentPath, testCopy.contents.replace(/\r\n/g, '\n'));
-        }
-    });
-
-    results.on('end', function() {
-        compiler.end();
-    });
-}
+if(t262.config.compile) compile(results);
 
 if(t262.config.reporter === 'json') {
     results.pipe(jss).pipe(process.stdout);
@@ -181,6 +153,37 @@ function exclude(test) {
         }
     }
     return f;
+}
+
+// dump files to disk based on the compile flag
+function compile(results) {
+    optionsCopy = shallowCopy(t262.config);
+    optionsCopy.batch = false;
+    optionsCopy.compileOnly = true;
+    var compiler = new Runner(optionsCopy);
+
+    _(results).observe().each(function(test) {
+        var compile = t262.config.compile === 'failures' && !test.pass;
+        compile = compile || t262.config.compile === 'all';
+        compile = compile || t262.config.compile === 'passes' && !!test.pass
+
+        if(compile) {
+            var testCopy = shallowCopy(test);
+            compiler.compile(testCopy)
+            var startPath = path.join(process.cwd(), t262.config.outputDir, path.basename(test.file));
+            var currentPath = startPath;
+            var counter = 0;
+            while(fs.existsSync(currentPath)) {
+                currentPath = startPath.replace(/.js$/, "-" + counter++ + ".js");
+            }
+            fs.writeFileSync(currentPath, testCopy.contents.replace(/\r\n/g, '\n'));
+        }
+    });
+
+    results.on('end', function() {
+        compiler.end();
+    });
+
 }
 
 function printVersion() {
