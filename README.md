@@ -16,9 +16,9 @@ Run language tests in the default runner (Node):
 
 Using -T, collateral paths are relative to the test262 root directory:
 
-`> test262-harness -T ~/test262 language/**/*`
+`> test262-harness -T ~/test262 language/**/*.js`
 
-When a glob matches a directory, the default behavior will run all files under it recursively:
+When a glob matches a directory, the default behavior will run all .js files under it recursively:
 
 `> test262-harness -T ~/test262 language`
 

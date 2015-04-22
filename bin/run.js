@@ -277,7 +277,7 @@ function getFilesStream(config) {
 
     // by default, run all files recursively when we pass test262Dir
     if(config.test262Dir && files.length === 0) {
-        files = ['**/*']
+        files = ['**/*.js']
     }
 
     files = files.map(function(p) {
@@ -286,7 +286,7 @@ function getFilesStream(config) {
         }
 
         if(fs.existsSync(p) && fs.statSync(p).isDirectory()) {
-            p = path.join(p, '**/*');
+            p = path.join(p, '**/*.js');
         }
 
         return p;
