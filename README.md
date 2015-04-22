@@ -10,9 +10,13 @@ If you need the official test262 collateral:
 `git clone https://github.com/tc39/test262.git --depth 1`
 
 ### Examples
-Run chapter 8 tests in the default runner (Node):
+Run language tests in the default runner (Node):
 
-`> test262-harness "../test262/test/suite/ch08/**/*.js"`
+`> test262-harness "../test262/test/language/**/*.js"`
+
+Using -T, collateral paths are relative to the test262 root directory:
+
+`> test262-harness -T ~/test262 language/**/*`
 
 Run local tests in jsshell:
 
@@ -31,7 +35,7 @@ These options may be passed on the command line or passed to useConfig in your c
 | -r, --runner | Selects a runner to use. Currently available are `node`, `node-ip`, `jsshell`, and `console`. Config files may also pass a runner constructor whose instances implement the runner API described below.
 | -c, --config | Load a config.js file
 | -C, --compile | Save compiled tests so they can be run directly in the host without the harness. Can specify either "all" or "failures". Default is "all".
-| -o, --output | Output directory for compiled test collateral
+| -o, --outputDir | Output directory for compiled test collateral
 | -e, --consoleCommand | For console runner, sets the command to invoke. Must be in PATH.
 | -p, --consolePrintCommand | For console runner, sets the command to write to console. Used for reporting errors to the harness.
 | -t, --threads | Run this many tests in parallel.
@@ -39,6 +43,7 @@ These options may be passed on the command line or passed to useConfig in your c
 | --testStrict | Tests both strict and non-strict mode (note: many tests need fixing for this to work)
 | -R, --reporter | Selects test case result format. Currently either `json`, `tap`, or `simple`. Default `simple`.
 | --prelude | Appends specified file to the top of each test file.
+| -T, --test262Dir | Root test262 directory. When used, globs are relative to the test262Dir/test.
 
 
 ## Config File

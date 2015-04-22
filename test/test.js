@@ -92,3 +92,18 @@ test('compile flag throws without output directory', function(t) {
         rimraf.sync('./testOutput');
     });
 });
+
+// test that helpers work when specifying a glob to a test262 folder structure
+utils.testResultsCorrect('-r node-ip', 'test/test262alike/test/**/*.js', [
+    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
+]);
+
+// test test262Dir - helpers found, and test path relative to test262Dir/test
+utils.testResultsCorrect('-r node-ip --test262Dir test/test262alike', '**/*.js', [
+    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
+]);
+
+// test that we can pass a separate helper directory
+utils.testResultsCorrect('-r node-ip --test262Dir test/test262alike --includesDir test/test262alike/badHarness', '**/*.js', [
+    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: false, errorName: 'Error', errorMessage: 'bad' }
+]);

@@ -14,6 +14,7 @@ var args = require('minimist')(process.argv.slice(2), {
         config: 'c',
         compile: 'C',
         outputDir: 'o',
+        test262Dir: 'T',
         help: 'h',
         version: 'v'
     }
@@ -51,10 +52,39 @@ if(!t262.config.outputDir && t262.config.compile)
     throw 'need output directory for compiled collateral';
 if(t262.config.compile && !fs.existsSync(t262.config.outputDir)) fs.mkdirSync(t262.config.outputDir);
 
+if(!t262.config.includesDir) {
+    if(t262.config.test262Dir) {
+        // relative to test262dir
+        t262.config.includesDir = path.join(t262.config.test262Dir, 'harness');
+    } else {
+        var fromGlob = includesDirFromGlob(t262.config._[0]);
+
+        if(fromGlob) {
+            t262.config.includesDir = fromGlob;
+        } else if(fs.existsSync('harness/')) {
+            // harness dir is present in our cwd
+            t262.config.includesDir = 'harness/';
+        } else {
+            // else fall back to local harness deps
+            t262.config.includesDir = path.join(__dirname, '../lib/helpers/');
+        }
+    }
+}
+
 var start = Date.now();
 
-var files = _(t262.config._.map(globStream)).merge();
+var files = t262.config._;
+
+if(t262.config.test262Dir) {
+    files = files.map(function(p) {
+        return path.join(t262.config.test262Dir, 'test', p);
+    })
+}
+
+files = _(files.map(globStream)).merge();
+
 if (t262.config.exclude) files = files.filter(exclude);
+
 var contents = files.fork().map(readFile).sequence();
 var tests = contents.zip(files.fork()).map(function(d) {
     return parser.parseFile({ contents: d[0].toString('utf8'), file: d[1]});
@@ -186,6 +216,31 @@ function compile(results) {
 
 }
 
+// Walk recursively up the directory tree looking for a directory which
+// has a "harness" directory next to a "test" directory. Return the
+// path to the "test" directory.
+function includesDirFromGlob(p) {
+    if(!p) return null;
+
+    var dir = path.dirname(p);
+    var base = path.basename(p);
+
+    if(base !== "test") {
+        if(dir === p) return null; // reached the root directory
+
+        return includesDirFromGlob(dir);
+    }
+
+    var harnessPath = path.join(dir, 'harness');
+
+    // see if the harness directory exists here
+    if(fs.existsSync(harnessPath)) {
+        return harnessPath;
+    } else {
+        return includesDirFromGlob(dir);
+    }
+}
+
 function printVersion() {
     var p = require(path.resolve(__dirname, "..", "package.json"));
     console.log("test262-harness v" + p.version);
@@ -201,7 +256,7 @@ function printHelp() {
     console.log(" -r, --runner               Specify runner (node, node-ip, jsshell, console)");
     console.log(" -c, --config               Load a config.js file");
     console.log(" -C, --compile              Save compiled tests.");
-    console.log(" -o, --output               Output directory for compiled tests.");
+    console.log(" -o, --outputDir            Output directory for compiled tests.");
     console.log(" -e, --consoleCommand       Command for console runner.");
     console.log(" -p, --consolePrintCommand  Print command.");
     console.log(" -t, --threads              Run this many tests in parallel.");
@@ -209,6 +264,8 @@ function printHelp() {
     console.log(" --testStrict               Tests both strict and non-strict mode.");
     console.log(" -R, --reporter             Specify reporter (json, tap, simple).");
     console.log(" --prelude                  Prepends specified file to each test file.");
+    console.log(" --includesDir              Directory with includes. Usually inferred.");
+    console.log(" -T, --test262Dir           Root directory of test262.");
     console.log(" -v, --version              Print test262-harness version.");
     console.log(" -h, --help                 Print short help.");
 

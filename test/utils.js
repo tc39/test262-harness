@@ -30,9 +30,14 @@ function expectedString(exp) {
  * @param {string} args Arguments to pass to the harness. Does not handle quoted strings.
  * @param {result[]} expectedResults expected pass results for the tests.
  */
-exports.testResultsCorrect = function testResultsCorrect(args, expectedResults) {
+exports.testResultsCorrect = function testResultsCorrect(args, path, expectedResults) {
+    if(!expectedResults) {
+        expectedResults = path;
+        path = undefined;
+    }
+
     test(args, function(t) {
-        exports.run(args, function(res, stderr) {
+        exports.run(args, path, function(res, stderr) {
             t.equal(stderr, "", "No stderr is present");
             t.equal(res.length, expectedResults.length, expectedResults.length + " tests run");
             expectedResults.forEach(function(exp) {
@@ -64,12 +69,20 @@ exports.testResultsCorrect = function testResultsCorrect(args, expectedResults) 
 /**
  * Runs test262-harness with the specified arguments.
  * @param {string} args Arguments to pass to the harness. Does not handle quoted strings.
+ * @param {string} path Path to look for test collateral. Defaults to test/collateral/*.js
  * @param {runCallback} done
  */
-exports.run = function run(args, done) {
+exports.run = function run(args, path, done) {
     var stdout = '';
     var stderr = '';
-    args = args.split(" ").concat('--reporter', 'json','test/collateral/*.js');
+    if(!done) {
+        done = path;
+        path = undefined;
+    }
+
+    path = path || 'test/collateral/*.js';
+    console.log("Runing at path " + path);
+    args = args.split(" ").concat('--reporter', 'json', path);
 
     var child = cp.fork('bin/run.js', args, {silent: true})
     child.stdout.on('data', function(d) { stdout += d });
