@@ -93,17 +93,27 @@ test('compile flag throws without output directory', function(t) {
     });
 });
 
-// test that helpers work when specifying a glob to a test262 folder structure
+// helpers work when specifying a glob to a test262 folder structure
 utils.testResultsCorrect('-r node-ip', 'test/test262alike/test/**/*.js', [
     { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
 ]);
 
-// test test262Dir - helpers found, and test path relative to test262Dir/test
+// test262Dir - helpers found, and test path relative to test262Dir/test
 utils.testResultsCorrect('-r node-ip --test262Dir test/test262alike', '**/*.js', [
     { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
 ]);
 
-// test that we can pass a separate helper directory
+// we can pass a separate helper directory
 utils.testResultsCorrect('-r node-ip --test262Dir test/test262alike --includesDir test/test262alike/badHarness', '**/*.js', [
     { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: false, errorName: 'Error', errorMessage: 'bad' }
+]);
+
+// We can pass a directory and it will run all files underneath it
+utils.testResultsCorrect('-r node-ip', 'test/test262alike/test', [
+    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
+]);
+
+// We can pass test262dir and by default it will run all files under the test directory
+utils.testResultsCorrect('-r node-ip --test262Dir test/test262alike', '', [
+    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
 ]);

@@ -275,11 +275,23 @@ function applyDefaults(config) {
 function getFilesStream(config) {
     var files = config._;
 
-    if(config.test262Dir) {
-        files = files.map(function(p) {
-            return path.join(config.test262Dir, 'test', p);
-        })
+    // by default, run all files recursively when we pass test262Dir
+    if(config.test262Dir && files.length === 0) {
+        files = ['**/*']
     }
+
+    files = files.map(function(p) {
+        if(config.test262Dir) {
+            p = path.join(config.test262Dir, 'test', p);
+        }
+
+        if(fs.existsSync(p) && fs.statSync(p).isDirectory()) {
+            p = path.join(p, '**/*');
+        }
+
+        return p;
+    })
+
 
     files = _(files.map(globStream)).merge();
 

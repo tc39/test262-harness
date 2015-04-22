@@ -80,8 +80,8 @@ exports.run = function run(args, path, done) {
         path = undefined;
     }
 
-    path = path || 'test/collateral/*.js';
-    console.log("Runing at path " + path);
+    if(path === undefined) path = 'test/collateral/*.js';
+
     args = args.split(" ").concat('--reporter', 'json', path);
 
     var child = cp.fork('bin/run.js', args, {silent: true})

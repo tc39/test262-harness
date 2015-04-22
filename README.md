@@ -18,6 +18,10 @@ Using -T, collateral paths are relative to the test262 root directory:
 
 `> test262-harness -T ~/test262 language/**/*`
 
+When a glob matches a directory, the default behavior will run all files under it recursively:
+
+`> test262-harness -T ~/test262 language`
+
 Run local tests in jsshell:
 
 `> test262-harness -r jsshell -e jsshell/js -b ./tests`
