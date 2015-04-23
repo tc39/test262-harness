@@ -37,8 +37,15 @@ var minimatch = require('minimatch');
 var Liftoff = require('liftoff');
 var cli = new Liftoff({ name: 'test262-harness'})
 
-if(args.version) return printVersion();
-if(args.help) return printHelp();
+if(args.version) {
+    printVersion();
+    process.exit(0);
+}
+
+if(args.help) {
+    printHelp();
+    process.exit(0);
+}
 
 cli.launch({
     cwd: args.cwd,
@@ -303,7 +310,6 @@ function getFilesStream(config) {
 function printVersion() {
     var p = require(path.resolve(__dirname, "..", "package.json"));
     console.log("test262-harness v" + p.version);
-    process.exit(0);
 }
 
 function printHelp() {
@@ -328,7 +334,5 @@ function printHelp() {
     console.log(" -T, --test262Dir           Root directory of test262.");
     console.log(" -v, --version              Print test262-harness version.");
     console.log(" -h, --help                 Print short help.");
-
-    process.exit(0);
 }
 
