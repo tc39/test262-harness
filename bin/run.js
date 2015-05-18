@@ -58,9 +58,15 @@ cli.launch({
         require(env.configPath);
     }
 
+    // If we've loaded a console command config path,
+    // add it to the 
+    if(t262.config.consoleCommand) {
+        t262.config.consoleCommand = path.join(env.cwd, t262.config.consoleCommand);
+    }
+
     // command line flags override anything specified by config files
     t262.useConfig(args);
-
+    
     applyDefaults(t262.config);
 
     var Runner = t262.loadRunner();
@@ -277,6 +283,8 @@ function applyDefaults(config) {
             }
         }
     }
+
+    if(!config.consoleArguments) config.consoleArguments = "";
 }
 
 function getFilesStream(config) {
@@ -324,6 +332,7 @@ function printHelp() {
     console.log(" -C, --compile              Save compiled tests.");
     console.log(" -o, --outputDir            Output directory for compiled tests.");
     console.log(" -e, --consoleCommand       Command for console runner.");
+    console.log(" --consoleArguments         Arguments for console runner.");
     console.log(" -p, --consolePrintCommand  Print command.");
     console.log(" -t, --threads              Run this many tests in parallel.");
     console.log(" -b, --batch                How many tests to batch together.");
