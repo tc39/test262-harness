@@ -305,8 +305,7 @@ function getFilesStream(config) {
         }
 
         return p;
-    })
-
+    });
 
     files = _(files.map(globStream)).merge();
 

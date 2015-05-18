@@ -20,6 +20,7 @@
     "minimist": "^0.2.0",
     "stream-bifurcate": "^1.0.0",
     "tap": "~0.4.11",
+    "temp": "^0.8.1",
     "test262-parser": "^2.0.5",
     "through": "~2.3.4"
   },
