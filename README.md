@@ -123,8 +123,11 @@ All runners have the same basic interface. Supporting new hosts, transpilers, or
 #### Runner(args)
 Runners are constructed by passing the current configuration object.
 
+#### Runner.prototype.needsCtrlFlow
+Boolean flag indicating whether control-flow-related code should be injected during test compilation (see `Runner.prototype.compile`).
+
 #### Runner.prototype.compile(test)
-Modifies the test contents to run in the target host. By default, it will append a call to $DONE if not already present, append any the environment dependencies (eg. $DONE, $LOG, etc) found in `this.deps`, append helpers, and add "use strict" if required.
+Modifies the test contents to run in the target host. By default, it will append a call to $DONE if not already present, append the appropriate environment dependencies (eg. `$DONE`, `$LOG`, `$ERROR`, etc), append helpers, and add "use strict" if required.
 
 #### Runner.prototype.link(test)
 Recursively appends helpers required in the front-matter of the test.
