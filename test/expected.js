@@ -15,6 +15,8 @@ var all = [
     { file: 'test/collateral/error.js', strictMode: true, pass: false, errorMessage: 'failure message', errorName: 'Test262Error' },
     { file: 'test/collateral/thrownError.js', strictMode: false, pass: false, errorMessage: 'failure message', errorName: 'Error', topOfStack: "foo" },
     { file: 'test/collateral/thrownError.js', strictMode: true, pass: false, errorMessage: 'failure message', errorName: 'Error', topOfStack: "foo" },
+    { file: 'test/collateral/negativeMessage.js', strictMode: false, pass: false, errorMessage: "'ExpectedError' is expected, but was not thrown", errorName: 'Error Expected'},
+    { file: 'test/collateral/negativeMessage.js', strictMode: true, pass: false, errorMessage: "'ExpectedError' is expected, but was not thrown", errorName: 'Error Expected'},
 ]
 
 var seen = {};
