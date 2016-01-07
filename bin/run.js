@@ -23,6 +23,7 @@ var args = require('minimist')(process.argv.slice(2), {
 var parser = require('test262-parser');
 var tapify = require('../lib/tapify');
 var simpleReporter = require('../lib/simpleReporter.js');
+var baselineReporter = require('../lib/baselineReporter.js');
 var _ = require('highland');
 var glob = require('glob');
 var fs = require('fs');
@@ -97,6 +98,13 @@ cli.launch({
         results.pipe(jss).pipe(process.stdout);
     } else if(t262.config.reporter === 'tap') {
         results.pipe(tapify).pipe(process.stdout);
+    } else if(t262.config.reporter === 'baseline') {
+        results.pipe(baselineReporter(t262.config.test262Dir || process.cwd()));
+
+        results.on('end', function() {
+            // show time on stderr to exclude it from baseline output
+            console.error("Took " + ((Date.now() - start) / 1000) + " seconds");
+        });
     } else if(t262.config.reporter === 'simple') {
         results.pipe(simpleReporter);
 
