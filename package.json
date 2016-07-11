@@ -12,8 +12,10 @@
   },
   "dependencies": {
     "async": "^2.0.0-rc.6",
+    "eshost": "^3.0.0",
     "glob": "~4.0.3",
     "rx": "^4.1.0",
+    "test262-compiler": "^1.0.0",
     "yargs": "^4.7.1"
   },
   "author": "Brian Terlson",
