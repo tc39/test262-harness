@@ -1,6 +1,8 @@
 /*---
 description: Should not test in strict mode
 flags: [raw]
+expected:
+  pass: true
 ---*/
 'use strict';
 var seemsStrict;

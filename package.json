@@ -11,9 +11,8 @@
     "test": "node_modules/.bin/tape test/test.js"
   },
   "dependencies": {
-    "async": "^2.0.0-rc.6",
     "eshost": "^3.0.0",
-    "glob": "~4.0.3",
+    "glob": "^7.0.5",
     "rx": "^4.1.0",
     "test262-compiler": "^1.0.0",
     "yargs": "^4.7.1"
@@ -28,6 +27,6 @@
   ],
   "devDependencies": {
     "rimraf": "^2.5.3",
-    "tape": "^3.0.3"
+    "tape": "^3.6.1"
   }
 }

@@ -9,11 +9,18 @@ const argv = require('../lib/cli.js').argv;
 const validator = require('../lib/validator.js');
 const Rx = require('rx');
 const util = require('util');
-const simpleReporter = require('../lib/reporters/simple.js');
 const resultsEmitter = require('../lib/resultsEmitter.js');
 const agentPool = require('../lib/agentPool.js');
 const test262Finder = require('../lib/findTest262.js');
 const scenariosForTest = require('../lib/scenarios.js');
+
+let reporter;
+if (fs.existsSync('lib/reporters/' + argv.reporter + '.js')) {
+  reporter = require('../lib/reporters/' + argv.reporter + '.js');
+} else {
+  console.error(`Reporter ${argv.reporter} not found.`);
+  process.exit(1);
+}
 
 let includesDir = argv.includesDir;
 let test262Dir = argv.test262Dir;
@@ -34,7 +41,7 @@ const results = rawResults.map(function (test) {
   return test;
 });
 const resultEmitter = resultsEmitter(results);
-simpleReporter(resultEmitter);
+reporter(resultEmitter);
 
 function printVersion() {
     var p = require(path.resolve(__dirname, "..", "package.json"));

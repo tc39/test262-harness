@@ -1,1 +1,0 @@
-function helper() {  return 'secret' };

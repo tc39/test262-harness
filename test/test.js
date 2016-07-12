@@ -1,119 +1,63 @@
 var test = require('tape');
-var utils = require('./utils');
-var expected = require('./expected');
-var rimraf = require('rimraf');
 var fs = require('fs');
 var path = require('path');
+var cp = require('child_process');
 
-var runners = [
-    '-r node',
-    '-r node-ip',
-    '-r console -e node'
-]
+run()
+.then(validate)
+.catch(reportRunError)
 
-// clean testOutput dir
-rimraf.sync('./testOutput');
+function validate(records) {
+  records.forEach(record => {
+    test(record.attrs.description, function (t) {
+      t.assert(record.attrs.expected, 'Test has an `expected` frontmatter');
+      if (!record.attrs.expected) {
+        // can't do anything else
+        t.end();
+        return;
+      }
 
-// default arguments and strict mode
-runners.forEach(function(runner) {
-    utils.testResultsCorrect(runner, expected.noTestStrict);
-    utils.testResultsCorrect(runner + ' --testStrict', expected);
-    test("compiling failures: " + runner + " -C failures -o testOutput", function(t) {
-        t.plan(2);
-        utils.run(runner + " -C failures -o testOutput", function(res, stderr) {
-            t.ok(fs.existsSync('./testOutput/error.js'), 'testOutput/error.js exists');
-            t.ok(fs.existsSync('./testOutput/thrownError.js'), 'testOutput/thrownError.js exists');
-            rimraf.sync('./testOutput');
-        });
+      t.equal(record.result.pass, record.attrs.expected.pass, 'Test passes or fails as expected');
+      
+      if (record.attrs.expected.message) {
+        t.equal(record.result.message, record.attrs.expected.message, 'Test fails with appropriate message');
+      }
+
+      t.end();
     });
+  });
+}
 
-    test("compiling failures: " + runner + " -C failures -o testOutput --testStrict", function(t) {
-        t.plan(4);
-        utils.run(runner + " -C failures -o testOutput --testStrict", function(res, stderr) {
-            t.ok(fs.existsSync('./testOutput/error.js'), 'testOutput/error.js exists');
-            t.ok(fs.existsSync('./testOutput/error-0.js'), 'testOutput/error-0.js exists');
-            t.ok(fs.existsSync('./testOutput/thrownError.js'), 'testOutput/thrownError.js exists');
-            t.ok(fs.existsSync('./testOutput/thrownError-0.js'), 'testOutput/thrownError-0.js exists');
-            rimraf.sync('./testOutput');
-        });
-    });
-});
+function reportRunError(e) {
+  console.error("Error running tests", e.stack);
+  process.exit(1);
+}
 
-// test exclusion
-utils.testResultsCorrect('-c test/excludeConfig.js', expected.excludeAB);
+function run() {
+  return new Promise((resolve, reject) => {
+    var stdout = '';
+    var stderr = '';
 
-// batch mode supported by console runner
-utils.testResultsCorrect('-r console -e node -b 5 -c test/nodeConfig.js', expected.noTestStrict);
-utils.testResultsCorrect('-r console -e node -b 5 --testStrict -c test/nodeConfig.js', expected);
+    var child = cp.fork('bin/run.js', [
+      '--hostType', 'node',
+      '--hostPath', process.execPath,
+      '-r', 'json',
+      '--includesDir', './test/test-includes',
+      'test/collateral/**/*.js'], {silent: true});
 
-// batch mode not supported by node and node-ip
-['node', 'node-ip'].forEach(function(runner) {
-    var args = '-r ' + runner + ' -b 5';
-    test(args, function(t) {
-        t.plan(2);
+    child.stdout.on('data', function(d) { stdout += d });
+    child.stderr.on('data', function(d) { stderr += d });
+    child.on('exit', function() {
+      if (stderr) {
+        return reject(new Error("Got stderr: " + stderr));
+      }
 
-        utils.run(args, function(res, stderr) {
-            t.equal(res.length, 0, 'no results');
-            t.ok(stderr.length > 0, 'stderr is present');
-        });
+      try {
+        resolve(JSON.parse(stdout));
+      } catch(e) {
+        reject(e);
+      }
     })
-});
+  });
+}
 
-test('compile flag defaults to compiling all collateral', function(t) {
-    utils.run("-r node -C -o testOutput", function(res, stderr) {
-        expected.noTestStrict.forEach(function(exp) {
-            var expectedLoc = './testOutput/' + path.basename(exp.file);
-            t.ok(fs.existsSync(expectedLoc), expectedLoc + ' exists');
-        })
-
-        rimraf.sync('./testOutput');
-        t.end();
-    });
-});
-
-test('compile flag defaults to compiling all collateral', function(t) {
-    utils.run("-r node -C all -o testOutput", function(res, stderr) {
-        expected.noTestStrict.forEach(function(exp) {
-            var expectedLoc = './testOutput/' + path.basename(exp.file);
-            t.ok(fs.existsSync(expectedLoc), expectedLoc + ' exists');
-        })
-
-        rimraf.sync('./testOutput');
-        t.end();
-    });
-});
-
-test('compile flag throws without output directory', function(t) {
-    t.plan(2);
-
-    utils.run('-r node -C failures', function(res, stderr) {
-        t.equal(res.length, 0, 'no results');
-        t.ok(stderr.length > 0, 'stderr is present');
-        rimraf.sync('./testOutput');
-    });
-});
-
-// helpers work when specifying a glob to a test262 folder structure
-utils.testResultsCorrect('-r node-ip', 'test/test262alike/test/**/*.js', [
-    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
-]);
-
-// test262Dir - helpers found, and test path relative to test262Dir/test
-utils.testResultsCorrect('-r node-ip --test262Dir test/test262alike', '**/*.js', [
-    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
-]);
-
-// we can pass a separate helper directory
-utils.testResultsCorrect('-r node-ip --test262Dir test/test262alike --includesDir test/test262alike/badHarness', '**/*.js', [
-    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: false, errorName: 'Error', errorMessage: 'bad' }
-]);
-
-// We can pass a directory and it will run all files underneath it
-utils.testResultsCorrect('-r node-ip', 'test/test262alike/test', [
-    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
-]);
-
-// We can pass test262dir and by default it will run all files under the test directory
-utils.testResultsCorrect('-r node-ip --test262Dir test/test262alike', '', [
-    { file: 'test/test262alike/test/testHelper.js', strictMode: false, pass: true }
-]);

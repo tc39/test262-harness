@@ -1,8 +1,11 @@
 /*---
 description: Async test
-note: Will only work in hosts with setTimeout...
+expected:
+  pass: true
 ---*/
 
-process.nextTick(function() {
-    $DONE()
-})
+var p = new Promise(function(resolve) {
+  resolve();
+});
+
+p.then($DONE, $DONE);
