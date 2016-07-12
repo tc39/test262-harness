@@ -27,7 +27,7 @@
     "test"
   ],
   "devDependencies": {
-    "rimraf": "^2.2.8",
+    "rimraf": "^2.5.3",
     "tape": "^3.0.3"
   }
 }
