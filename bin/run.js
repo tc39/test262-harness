@@ -4,6 +4,7 @@
 // This code is governed by the BSD License found in the LICENSE file.
 const compile = require('test262-compiler');
 const fs = require('fs');
+const Path = require('path');
 const globber = require('../lib/globber.js');
 const argv = require('../lib/cli.js').argv;
 const validator = require('../lib/validator.js');
@@ -15,7 +16,7 @@ const test262Finder = require('../lib/findTest262.js');
 const scenariosForTest = require('../lib/scenarios.js');
 
 let reporter;
-if (fs.existsSync('lib/reporters/' + argv.reporter + '.js')) {
+if (fs.existsSync(Path.join(__dirname, '../lib/reporters', argv.reporter + '.js'))) {
   reporter = require('../lib/reporters/' + argv.reporter + '.js');
 } else {
   console.error(`Reporter ${argv.reporter} not found.`);
