@@ -28,9 +28,9 @@ let test262Dir = argv.test262Dir;
 
 // Test Pipeline
 const pool = agentPool(Number(argv.threads), argv.hostType, argv.hostArgs, argv.hostPath);
-const paths = globber(argv._[0]);
+const paths = globber(argv._);
 if (!includesDir && !test262Dir) {
-  test262Dir = test262Finder(paths.fileEvents);
+  test262Dir = test262Finder(paths.fileEvents[0]);
 }
 const files = paths.map(pathToTestFile);
 const tests = files.map(compileFile);
