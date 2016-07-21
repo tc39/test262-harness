@@ -36,7 +36,7 @@ const files = paths.map(pathToTestFile);
 const tests = files.map(compileFile);
 const scenarios = tests.flatMap(scenariosForTest);
 const pairs = Rx.Observable.zip(pool, scenarios);
-const rawResults = pairs.flatMap(pool.runTest);
+const rawResults = pairs.flatMap(pool.runTest).tapOnCompleted(() => pool.destroy());;
 const results = rawResults.map(function (test) {
   test.result = validator(test);
   return test;
