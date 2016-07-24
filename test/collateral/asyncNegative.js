@@ -5,6 +5,6 @@ expected:
   pass: true
 ---*/
 
-process.nextTick(function() {
+setTimeout(function() {
     $DONE(new RangeError());
-});
+}, 1000);
