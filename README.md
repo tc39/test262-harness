@@ -1,6 +1,8 @@
 ## Test262-Harness
 An experimental Node-based test262 harness. Once this harness has stabilized, I plan to push to include it by default in official test262.
 
+Requires Node 6 or above.
+
 ## Quick Start
 1. `git clone https://github.com/tc39/test262.git --depth 1`
 2. `npm install -g test262-harness`
