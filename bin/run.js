@@ -41,7 +41,7 @@ const results = rawResults.map(function (test) {
   test.result = validator(test);
   return test;
 });
-const resultEmitter = resultsEmitter(results);
+const resultEmitter = resultsEmitter(results, argv);
 reporter(resultEmitter);
 
 function printVersion() {
