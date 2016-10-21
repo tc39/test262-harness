@@ -1,7 +1,7 @@
 {
   "name": "test262-harness",
   "repository": "bterlson/test262-harness",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Node-based harness for test262",
   "main": "index.js",
   "bin": {
