@@ -21,5 +21,6 @@ Run `test262-harness --help` for details on the various configuration options.
 | -r, --reporter | Selects test case result format. Currently either `json` or `simple`. Default `simple`.
 |--test262Dir | Optional. Root test262 directory and is used to locate the includes directory.
 |--includesDir | Includes directory. By default inferred from test262Dir or else detected by walking upward from the first test found.
+|--prelude | Path to a file to include before every test (useful for testing polyfills for example)
 
 
