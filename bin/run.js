@@ -26,8 +26,30 @@ if (fs.existsSync(Path.join(__dirname, '../lib/reporters', argv.reporter + '.js'
 let includesDir = argv.includesDir;
 let test262Dir = argv.test262Dir;
 
+// Select hostType and hostPath. hostType defaults to 'node'.
+// If using default hostType, hostPath defaults to the current node executable location.
+let hostType, hostPath;
+if (argv.hostType) {
+  hostType = argv.hostType;
+
+  if (argv.hostPath) {
+    console.error('Missing host path. Pass --hostPath with a path to the host executable you want to test.');
+    process.exit(1);
+  }
+
+  hostPath = argv.hostPath;
+} else {
+  hostType = 'node';
+
+  if (argv.hostPath) {
+    hostPath = argv.hostPath;
+  } else {
+    hostPath = process.execPath;
+  }
+}
+
 // Test Pipeline
-const pool = agentPool(Number(argv.threads), argv.hostType, argv.hostArgs, argv.hostPath);
+const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath);
 const paths = globber(argv._);
 if (!includesDir && !test262Dir) {
   test262Dir = test262Finder(paths.fileEvents[0]);
