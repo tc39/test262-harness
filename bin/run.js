@@ -15,6 +15,13 @@ const agentPool = require('../lib/agentPool.js');
 const test262Finder = require('../lib/findTest262.js');
 const scenariosForTest = require('../lib/scenarios.js');
 
+// test262 directory (used to locate includes unless overridden with includesDir)
+let test262Dir = argv.test262Dir;
+// where to load includes from (usually a subdirectory of test262dir)
+let includesDir = argv.includesDir;
+
+// initialize reporter by attempting to load lib/reporters/${reporter}
+// defaults to 'simple'
 let reporter;
 if (fs.existsSync(Path.join(__dirname, '../lib/reporters', argv.reporter + '.js'))) {
   reporter = require('../lib/reporters/' + argv.reporter + '.js');
@@ -23,8 +30,13 @@ if (fs.existsSync(Path.join(__dirname, '../lib/reporters', argv.reporter + '.js'
   process.exit(1);
 }
 
-let includesDir = argv.includesDir;
-let test262Dir = argv.test262Dir;
+// load preload contents
+let preludeContents;
+if (argv.prelude) {
+  preludeContents = fs.readFileSync(argv.prelude, 'utf8');
+} else {
+  preludeContents = '';
+}
 
 // Select hostType and hostPath. hostType defaults to 'node'.
 // If using default hostType, hostPath defaults to the current node executable location.
@@ -76,5 +88,6 @@ function pathToTestFile(path) {
 }
 
 function compileFile(contents) {
+  contents = preludeContents + contents;
   return compile(contents, { test262Dir: test262Dir, includesDir: includesDir });
 }
