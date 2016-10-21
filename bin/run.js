@@ -44,7 +44,7 @@ let hostType, hostPath;
 if (argv.hostType) {
   hostType = argv.hostType;
 
-  if (argv.hostPath) {
+  if (!argv.hostPath) {
     console.error('Missing host path. Pass --hostPath with a path to the host executable you want to test.');
     process.exit(1);
   }
@@ -87,7 +87,15 @@ function pathToTestFile(path) {
   return { file: path, contents: fs.readFileSync(path, 'utf-8')};
 }
 
-function compileFile(contents) {
-  contents = preludeContents + contents;
-  return compile(contents, { test262Dir: test262Dir, includesDir: includesDir });
+const endFrontmatterRe = /---\*\/\r?\n/g;
+function compileFile(test) {
+  const match = endFrontmatterRe.exec(test.contents);
+  if (match) {
+    test.contents = test.contents.slice(0, endFrontmatterRe.lastIndex)
+                    + preludeContents
+                    + test.contents.slice(endFrontmatterRe.lastIndex);
+  } else {
+    test.contents = preludeContents + test.contents;
+  }
+  return compile(test, { test262Dir: test262Dir, includesDir: includesDir });
 }
