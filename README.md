@@ -6,7 +6,7 @@ Requires Node 6 or above.
 ## Quick Start
 1. `git clone https://github.com/tc39/test262.git --depth 1`
 2. `npm install -g test262-harness`
-3. `test262-harness 'test262\test\**\*.js'
+3. `test262-harness 'test262\test\**\*.js'`
 
 Run `test262-harness --help` for details on the various configuration options.
 
