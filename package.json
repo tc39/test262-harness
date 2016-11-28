@@ -1,7 +1,7 @@
 {
   "name": "test262-harness",
   "repository": "bterlson/test262-harness",
-  "version": "2.3.1",
+  "version": "2.4.0",
   "description": "Node-based harness for test262",
   "main": "index.js",
   "bin": {
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "chalk": "^1.1.3",
-    "eshost": "^3.2.0",
+    "eshost": "^3.3.2",
     "glob": "^7.0.5",
     "rx": "^4.1.0",
     "test262-compiler": "^2.0.0",

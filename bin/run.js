@@ -2,6 +2,8 @@
 
 // Copyright (C) 2014, Microsoft Corporation. All rights reserved.
 // This code is governed by the BSD License found in the LICENSE file.
+const DEFAULT_TEST_TIMEOUT = 10000;
+
 const compile = require('test262-compiler');
 const fs = require('fs');
 const Path = require('path');
@@ -60,8 +62,10 @@ if (argv.hostType) {
   }
 }
 
+argv.timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
+
 // Test Pipeline
-const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath);
+const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath, { timeout: argv.timeout });
 const paths = globber(argv._);
 if (!includesDir && !test262Dir) {
   test262Dir = test262Finder(paths.fileEvents[0]);
