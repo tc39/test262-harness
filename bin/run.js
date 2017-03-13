@@ -91,8 +91,8 @@ function pathToTestFile(path) {
   return { file: path, contents: fs.readFileSync(path, 'utf-8')};
 }
 
-const endFrontmatterRe = /---\*\/\r?\n/g;
 function compileFile(test) {
+  const endFrontmatterRe = /---\*\/\r?\n/g;
   const match = endFrontmatterRe.exec(test.contents);
   if (match) {
     test.contents = test.contents.slice(0, endFrontmatterRe.lastIndex)
