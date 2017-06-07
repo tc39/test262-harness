@@ -9,7 +9,8 @@ Promise.all([
   run(['--reporter-keys', 'attrs,result', 'test/collateral/bothStrict.js']),
   run(['--reporter-keys', 'rawResult,attrs,result', 'test/collateral/bothStrict.js']),
   run(['--reporter-keys', 'attrs,rawResult,result', 'test/collateral/bothStrict.js']),
-  run(['--reporter-keys', 'attrs,result,rawResult', 'test/collateral/bothStrict.js'])
+  run(['--reporter-keys', 'attrs,result,rawResult', 'test/collateral/bothStrict.js']),
+  run(['--babelPresets', 'stage-3', '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/spread-sngl-obj-ident.js'])
 ])
 .then(validate)
 .catch(reportRunError);
@@ -52,7 +53,7 @@ function run(extraArgs) {
 function validate(records) {
   const [
     normal, prelude, withoutRawResult, withRawResult1, withRawResult2,
-    withRawResult3
+    withRawResult3, babelResult
   ] = records;
   validateResultRecords(normal);
   validateResultRecords(prelude, { prelude: true });
@@ -60,6 +61,7 @@ function validate(records) {
   validateResultRecords(withRawResult1);
   validateResultRecords(withRawResult2);
   validateResultRecords(withRawResult3);
+  validateResultRecords(babelResult);
 }
 
 function validateResultRecords(records, options = { prelude: false }) {
