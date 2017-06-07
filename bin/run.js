@@ -85,6 +85,11 @@ if (argv.hostType) {
 }
 
 argv.timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
+let transpiler;
+if (argv.babelPresets) {
+  let babel = require('babel-core');
+  transpiler = code => babel.transform(code, { presets: argv.babelPresets.split(",") }).code;
+}
 
 // Show help if no arguments provided
 if (!argv._.length) {
@@ -94,7 +99,8 @@ if (!argv._.length) {
 }
 
 // Test Pipeline
-const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath, { timeout: argv.timeout });
+const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath,
+                       { timeout: argv.timeout, transpiler });
 const paths = globber(argv._);
 if (!includesDir && !test262Dir) {
   test262Dir = test262Finder(paths.fileEvents[0]);
