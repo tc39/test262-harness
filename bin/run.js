@@ -22,6 +22,12 @@ let test262Dir = argv.test262Dir;
 // where to load includes from (usually a subdirectory of test262dir)
 let includesDir = argv.includesDir;
 
+// print version of test262-harness
+if (argv.version) {
+  printVersion();
+  process.exit(0);
+}
+
 // initialize reporter by attempting to load lib/reporters/${reporter}
 // defaults to 'simple'
 let reporter;
@@ -83,8 +89,8 @@ const resultEmitter = resultsEmitter(results);
 reporter(resultEmitter);
 
 function printVersion() {
-    var p = require(path.resolve(__dirname, "..", "package.json"));
-    console.log("test262-harness v" + p.version);
+  var p = require(Path.resolve(__dirname, "..", "package.json"));
+  console.log(`v${p.version}`);
 }
 
 function pathToTestFile(path) {
