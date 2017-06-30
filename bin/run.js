@@ -8,7 +8,8 @@ const compile = require('test262-compiler');
 const fs = require('fs');
 const Path = require('path');
 const globber = require('../lib/globber.js');
-const argv = require('../lib/cli.js').argv;
+const cli = require('../lib/cli.js');
+const argv = cli.argv;
 const validator = require('../lib/validator.js');
 const Rx = require('rx');
 const util = require('util');
@@ -69,6 +70,12 @@ if (argv.hostType) {
 }
 
 argv.timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
+
+// Show help if no arguments provided
+if (!argv._.length) {
+  cli.showHelp();
+  process.exit(1);
+}
 
 // Test Pipeline
 const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath, { timeout: argv.timeout });
