@@ -4,6 +4,7 @@
 // This code is governed by the BSD License found in the LICENSE file.
 const DEFAULT_TEST_TIMEOUT = 10000;
 
+const parseFile = require('test262-parser').parseFile;
 const compile = require('test262-compiler');
 const fs = require('fs');
 const Path = require('path');
@@ -99,7 +100,7 @@ const paths = globber(argv._);
 if (!includesDir && !test262Dir) {
   test262Dir = test262Finder(paths.fileEvents[0]);
 }
-const files = paths.map(pathToTestFile);
+const files = paths.filter(p => p.indexOf("_FIXTURE") === -1).map(pathToTestFile);
 const tests = files.map(compileFile);
 const scenarios = tests.flatMap(scenariosForTest);
 const pairs = Rx.Observable.zip(pool, scenarios);
@@ -130,5 +131,61 @@ function compileFile(test) {
   } else {
     test.contents = preludeContents + test.contents;
   }
+  const parsed = parseFile(test);
+  getDeps(parsed, { test262Dir: test262Dir, includesDir: includesDir });
   return compile(test, { test262Dir, includesDir });
+}
+
+function getDeps(test, options = {}) {
+  let deps = `
+    function Test262Error(message) {
+        if (message) this.message = message;
+    }
+
+    Test262Error.prototype.name = "Test262Error";
+
+    Test262Error.prototype.toString = function () {
+        return "Test262Error: " + this.message;
+    };
+
+    function $ERROR(err) {
+      if(typeof err === "object" && err !== null && "name" in err) {
+          throw err;
+      } else {
+        throw new Test262Error(err);
+      }
+    }
+
+    function $DONE(err) {
+      if (err) {
+        if(typeof err === "object" && err !== null && "name" in err) {
+          print('test262/error ' + err.name + ': ' + err.message);
+        } else {
+          print('test262/error Test262Error: ' + err);
+        }
+      }
+      print('test262/done');
+      $262.destroy();
+    }
+
+    function $LOG(str) {
+      print(str);
+    }`
+
+  if (!options.test262Dir && !options.includesDir) {
+    throw new Error("Need one of test262Dir or includesDir options");
+  }
+
+  if (options.test262Dir && !options.includesDir) {
+    options.includesDir = Path.join(options.test262Dir, 'harness');
+  }
+
+  let helpers = test.attrs.includes;
+  helpers.push('assert.js');
+  for (var i = 0; i < helpers.length; i++) {
+    deps += '\n';
+    deps += fs.readFileSync(Path.join(options.includesDir, helpers[i]));
+  }
+
+  test.deps = deps;
 }
