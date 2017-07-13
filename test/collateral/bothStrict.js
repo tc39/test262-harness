@@ -1,6 +1,8 @@
 /*---
 description: Should test in both modes
-negative: ReferenceError
+negative:
+  phase: runtime
+  type: ReferenceError
 expected:
   pass: true
 ---*/

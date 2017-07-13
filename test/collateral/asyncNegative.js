@@ -1,10 +1,12 @@
 /*---
 description: Async test
-negative: RangeError
+negative:
+  phase: runtime
+  type: RangeError
 expected:
   pass: true
 ---*/
 
 setTimeout(function() {
-    $DONE(new RangeError());
+  $DONE(new RangeError());
 }, 1000);
