@@ -32,8 +32,8 @@ if (argv.version) {
 // initialize reporter by attempting to load lib/reporters/${reporter}
 // defaults to 'simple'
 let reporter;
-if (fs.existsSync(Path.join(__dirname, '../lib/reporters', argv.reporter + '.js'))) {
-  reporter = require('../lib/reporters/' + argv.reporter + '.js');
+if (fs.existsSync(Path.join(__dirname, '../lib/reporters', `${argv.reporter}.js`))) {
+  reporter = require(`../lib/reporters/${argv.reporter}.js`);
 } else {
   console.error(`Reporter ${argv.reporter} not found.`);
   process.exit(1);
@@ -49,7 +49,9 @@ if (argv.prelude) {
 
 // Select hostType and hostPath. hostType defaults to 'node'.
 // If using default hostType, hostPath defaults to the current node executable location.
-let hostType, hostPath;
+let hostType;
+let hostPath;
+
 if (argv.hostType) {
   hostType = argv.hostType;
 
@@ -87,8 +89,8 @@ const files = paths.map(pathToTestFile);
 const tests = files.map(compileFile);
 const scenarios = tests.flatMap(scenariosForTest);
 const pairs = Rx.Observable.zip(pool, scenarios);
-const rawResults = pairs.flatMap(pool.runTest).tapOnCompleted(() => pool.destroy());;
-const results = rawResults.map(function (test) {
+const rawResults = pairs.flatMap(pool.runTest).tapOnCompleted(() => pool.destroy());
+const results = rawResults.map(test => {
   test.result = validator(test);
   return test;
 });
@@ -96,7 +98,7 @@ const resultEmitter = resultsEmitter(results);
 reporter(resultEmitter);
 
 function printVersion() {
-  var p = require(Path.resolve(__dirname, "..", "package.json"));
+  const p = require(Path.resolve(__dirname, "..", "package.json"));
   console.log(`v${p.version}`);
 }
 
@@ -114,5 +116,5 @@ function compileFile(test) {
   } else {
     test.contents = preludeContents + test.contents;
   }
-  return compile(test, { test262Dir: test262Dir, includesDir: includesDir });
+  return compile(test, { test262Dir, includesDir });
 }
