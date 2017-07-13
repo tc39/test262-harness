@@ -4,8 +4,12 @@ const path = require('path');
 const cp = require('child_process');
 
 Promise.all([
-  run(),
-  run({ prelude: true })
+  run(['test/collateral/**/*.js']),
+  run(['--prelude', './test/test-prelude.js', 'test/collateral/bothStrict.js']),
+  run(['--reporter-keys', 'attrs,result', 'test/collateral/bothStrict.js']),
+  run(['--reporter-keys', 'rawResult,attrs,result', 'test/collateral/bothStrict.js']),
+  run(['--reporter-keys', 'attrs,rawResult,result', 'test/collateral/bothStrict.js']),
+  run(['--reporter-keys', 'attrs,result,rawResult', 'test/collateral/bothStrict.js'])
 ])
 .then(validate)
 .catch(reportRunError);
@@ -16,26 +20,16 @@ function reportRunError(error) {
   process.exit(1);
 }
 
-function run(options = { prelude: false }) {
+function run(extraArgs) {
   return new Promise((resolve, reject) => {
     let stdout = '';
     let stderr = '';
     let args = [
-      '--hostType', 'node',
-      '--hostPath', process.execPath,
-      '-r', 'json',
-      '--includesDir', './test/test-includes',
-    ];
-
-    if (options.prelude) {
-      args.push(
-        '--prelude',
-        './test/test-prelude.js',
-        'test/collateral/bothStrict.js'
-      );
-    } else {
-      args.push('test/collateral/**/*.js');
-    }
+        '--hostType', 'node',
+        '--hostPath', process.execPath,
+        '-r', 'json',
+        '--includesDir', './test/test-includes',
+      ].concat(extraArgs);
 
     const child = cp.fork('bin/run.js', args, { silent: true });
 
@@ -56,9 +50,16 @@ function run(options = { prelude: false }) {
 }
 
 function validate(records) {
-  const [normal, prelude] = records;
+  const [
+    normal, prelude, withoutRawResult, withRawResult1, withRawResult2,
+    withRawResult3
+  ] = records;
   validateResultRecords(normal);
   validateResultRecords(prelude, { prelude: true });
+  validateResultRecords(withoutRawResult, { noRawResult: true });
+  validateResultRecords(withRawResult1);
+  validateResultRecords(withRawResult2);
+  validateResultRecords(withRawResult3);
 }
 
 function validateResultRecords(records, options = { prelude: false }) {
@@ -84,6 +85,12 @@ function validateResultRecords(records, options = { prelude: false }) {
 
       if (options.prelude) {
         test.assert(record.rawResult.stdout.indexOf("prelude!") > -1, 'Has prelude content');
+      }
+
+      if (options.noRawResult) {
+        test.equal(record.rawResult, undefined);
+      } else {
+        test.equal(typeof record.rawResult, 'object');
       }
 
       test.end();

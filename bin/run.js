@@ -26,17 +26,29 @@ let includesDir = argv.includesDir;
 // print version of test262-harness
 if (argv.version) {
   printVersion();
-  process.exit(0);
+  return;
 }
 
 // initialize reporter by attempting to load lib/reporters/${reporter}
 // defaults to 'simple'
 let reporter;
+let reporterOpts = {};
 if (fs.existsSync(Path.join(__dirname, '../lib/reporters', `${argv.reporter}.js`))) {
   reporter = require(`../lib/reporters/${argv.reporter}.js`);
 } else {
   console.error(`Reporter ${argv.reporter} not found.`);
-  process.exit(1);
+  process.exitCode = 1;
+  return;
+}
+
+if (argv.reporterKeys) {
+  if (argv.reporter !== 'json') {
+    console.error('`--reporter-keys` option applies only to the `json` reporter.');
+    process.exitCode = 1;
+    return;
+  }
+
+  reporterOpts.reporterKeys = argv.reporterKeys.split(',');
 }
 
 // load preload contents
@@ -57,7 +69,8 @@ if (argv.hostType) {
 
   if (!argv.hostPath) {
     console.error('Missing host path. Pass --hostPath with a path to the host executable you want to test.');
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
 
   hostPath = argv.hostPath;
@@ -76,7 +89,8 @@ argv.timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
 // Show help if no arguments provided
 if (!argv._.length) {
   cli.showHelp();
-  process.exit(1);
+  process.exitCode = 1;
+  return;
 }
 
 // Test Pipeline
@@ -95,7 +109,7 @@ const results = rawResults.map(test => {
   return test;
 });
 const resultEmitter = resultsEmitter(results);
-reporter(resultEmitter);
+reporter(resultEmitter, reporterOpts);
 
 function printVersion() {
   const p = require(Path.resolve(__dirname, "..", "package.json"));
