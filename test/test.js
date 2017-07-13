@@ -4,8 +4,8 @@ const path = require('path');
 const cp = require('child_process');
 
 Promise.all([
-  run(),
-  run({ prelude: true })
+  run(['test/collateral/**/*.js']),
+  run(['--prelude', './test/test-prelude.js', 'test/collateral/bothStrict.js'])
 ])
 .then(validate)
 .catch(reportRunError);
@@ -16,26 +16,16 @@ function reportRunError(error) {
   process.exit(1);
 }
 
-function run(options = { prelude: false }) {
+function run(extraArgs) {
   return new Promise((resolve, reject) => {
     let stdout = '';
     let stderr = '';
     let args = [
-      '--hostType', 'node',
-      '--hostPath', process.execPath,
-      '-r', 'json',
-      '--includesDir', './test/test-includes',
-    ];
-
-    if (options.prelude) {
-      args.push(
-        '--prelude',
-        './test/test-prelude.js',
-        'test/collateral/bothStrict.js'
-      );
-    } else {
-      args.push('test/collateral/**/*.js');
-    }
+        '--hostType', 'node',
+        '--hostPath', process.execPath,
+        '-r', 'json',
+        '--includesDir', './test/test-includes',
+      ].concat(extraArgs);
 
     const child = cp.fork('bin/run.js', args, { silent: true });
 
