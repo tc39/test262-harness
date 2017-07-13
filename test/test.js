@@ -1,37 +1,49 @@
-var test = require('tape');
-var fs = require('fs');
-var path = require('path');
-var cp = require('child_process');
+const tape = require('tape');
+const fs = require('fs');
+const path = require('path');
+const cp = require('child_process');
 
 Promise.all([
   run(),
-  runPrelude()
+  run({ prelude: true })
 ])
 .then(validate)
 .catch(reportRunError);
 
-function reportRunError(e) {
-  console.error("Error running tests", e.stack);
+function reportRunError(error) {
+  console.error("Error running tests");
+  console.error(error.stack);
   process.exit(1);
 }
 
-function run() {
+function run(options = { prelude: false }) {
   return new Promise((resolve, reject) => {
-    var stdout = '';
-    var stderr = '';
-
-    var child = cp.fork('bin/run.js', [
+    let stdout = '';
+    let stderr = '';
+    let args = [
       '--hostType', 'node',
       '--hostPath', process.execPath,
       '-r', 'json',
       '--includesDir', './test/test-includes',
-      'test/collateral/**/*.js'], {silent: true});
+    ];
 
-    child.stdout.on('data', function(d) { stdout += d });
-    child.stderr.on('data', function(d) { stderr += d });
-    child.on('exit', function() {
+    if (options.prelude) {
+      args.push(
+        '--prelude',
+        './test/test-prelude.js',
+        'test/collateral/bothStrict.js'
+      );
+    } else {
+      args.push('test/collateral/**/*.js');
+    }
+
+    const child = cp.fork('bin/run.js', args, { silent: true });
+
+    child.stdout.on('data', (data) => { stdout += data });
+    child.stderr.on('data', (data) => { stderr += data });
+    child.on('exit', () => {
       if (stderr) {
-        return reject(new Error("Got stderr: " + stderr));
+        return reject(new Error(`Got stderr: ${stderr.toString()}`));
       }
 
       try {
@@ -39,87 +51,42 @@ function run() {
       } catch(e) {
         reject(e);
       }
-    })
+    });
   });
 }
 
 function validate(records) {
-  const normal = records[0];
-  const prelude = records[1];
-
-  validateNormal(normal);
-  validatePrelude(prelude);
+  const [normal, prelude] = records;
+  validateResultRecords(normal);
+  validateResultRecords(prelude, { prelude: true });
 }
 
-function validateNormal(records) {
+function validateResultRecords(records, options = { prelude: false }) {
   records.forEach(record => {
-    test(record.attrs.description, function (t) {
-      t.assert(record.attrs.expected, 'Test has an `expected` frontmatter');
+
+    const description = options.prelude ?
+      `${record.attrs.description} with prelude` :
+      record.attrs.description;
+
+    tape(description, test => {
+      test.assert(record.attrs.expected, 'Test has an "expected" frontmatter');
       if (!record.attrs.expected) {
         // can't do anything else
-        t.end();
+        test.end();
         return;
       }
 
-      t.equal(record.result.pass, record.attrs.expected.pass, 'Test passes or fails as expected');
-      
+      test.equal(record.result.pass, record.attrs.expected.pass, 'Test passes or fails as expected');
+
       if (record.attrs.expected.message) {
-        t.equal(record.result.message, record.attrs.expected.message, 'Test fails with appropriate message');
+        test.equal(record.result.message, record.attrs.expected.message, 'Test fails with appropriate message');
       }
 
-      t.end();
+      if (options.prelude) {
+        test.assert(record.rawResult.stdout.indexOf("prelude!") > -1, 'Has prelude content');
+      }
+
+      test.end();
     });
   });
 }
-
-function runPrelude() {
-  return new Promise((resolve, reject) => {
-    var stdout = '';
-    var stderr = '';
-
-    var child = cp.fork('bin/run.js', [
-      '--hostType', 'node',
-      '--hostPath', process.execPath,
-      '-r', 'json',
-      '--includesDir', './test/test-includes',
-      '--prelude', './test/test-prelude.js',
-      'test/collateral/bothStrict.js'], {silent: true});
-
-    child.stdout.on('data', function(d) { stdout += d });
-    child.stderr.on('data', function(d) { stderr += d });
-    child.on('exit', function() {
-      if (stderr) {
-        return reject(new Error("Got stderr: " + stderr));
-      }
-
-      try {
-        resolve(JSON.parse(stdout));
-      } catch(e) {
-        reject(e);
-      }
-    })
-  })
-}
-
-function validatePrelude(records) {
-  records.forEach(record => {
-    test(record.attrs.description + ' with prelude', function (t) {
-      t.assert(record.attrs.expected, 'Test has an `expected` frontmatter');
-      if (!record.attrs.expected) {
-        // can't do anything else
-        t.end();
-        return;
-      }
-
-      t.equal(record.result.pass, record.attrs.expected.pass, 'Test passes or fails as expected');
-      
-      if (record.attrs.expected.message) {
-        t.equal(record.result.message, record.attrs.expected.message, 'Test fails with appropriate message');
-      }
-
-      t.assert(record.rawResult.stdout.indexOf("prelude!") > -1, 'Has prelude content');
-      t.end();
-    });
-  });
-}
-
