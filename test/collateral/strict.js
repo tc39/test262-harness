@@ -1,7 +1,9 @@
 /*---
 description: Should not test in sloppy mode
 flags: [onlyStrict]
-negative: ReferenceError
+negative:
+  phase: runtime
+  type: ReferenceError
 expected:
   pass: true
 ---*/
