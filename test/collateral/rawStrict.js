@@ -1,5 +1,5 @@
 /*---
-description: Should not test in strict mode
+description: Should not test in strict mode (but allow strict mode to be enabled)
 flags: [raw]
 expected:
   pass: true

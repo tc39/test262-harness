@@ -1,5 +1,5 @@
 /*---
-description: Async test
+description: Async negative test
 negative:
   phase: runtime
   type: RangeError
