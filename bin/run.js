@@ -133,7 +133,7 @@ function compileFile(test) {
   }
   const parsed = parseFile(test);
   getDeps(parsed, { test262Dir: test262Dir, includesDir: includesDir });
-  return compile(test, { test262Dir, includesDir });
+  return parsed;
 }
 
 function getDeps(test, options = {}) {
