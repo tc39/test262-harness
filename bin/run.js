@@ -88,7 +88,20 @@ argv.timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
 let transpiler;
 if (argv.babelPresets) {
   let babel = require('babel-core');
-  transpiler = code => babel.transform(code, { presets: argv.babelPresets.split(",") }).code;
+
+  // https://github.com/bterlson/test262-harness/issues/87
+  let presets = argv.babelPresets.split(",").map(bp => {
+    if (!bp.startsWith('babel-preset-')) {
+      bp = `babel-preset-${bp}`;
+    }
+    // babel's option manager will look for presets relative to the current
+    // working directory, but we can give it absolute paths to start with
+    // and that ensure that it looks in the right place (relative to where
+    // test262-harness is installed)
+    return Path.resolve(__dirname, '../node_modules/', bp);
+  });
+
+  transpiler = code => babel.transform(code, { presets }).code;
 }
 
 // Show help if no arguments provided
