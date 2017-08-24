@@ -5,6 +5,7 @@ negative:
   type: RangeError
 expected:
   pass: true
+flags: [async]
 ---*/
 
 setTimeout(function() {
