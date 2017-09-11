@@ -31,9 +31,11 @@ Run `test262-harness --help` for details on the various configuration options.
 | `--hostArgs` | Any additional arguments to pass to the host when invoking it (eg. `--harmony`, `--es6all`, etc). 
 | `-t`, `--threads` | Run this many tests in parallel. Note that the browser runners don't work great with t > 1.
 | `-r`, `--reporter` | Format of data written to standard output. Currently either `json` or `simple`. Default `simple`.
+|`--reporter-keys` | Comma-separated list of keys to include in output of `json` reporter.
 |`--test262Dir` | Optional. Root test262 directory and is used to locate the includes directory.
 |`--includesDir` | Includes directory. By default inferred from test262Dir or else detected by walking upward from the first test found.
 |`--prelude` | Path to a file to include before every test (useful for testing polyfills for example)
-|`--reporter-keys` | Comma-separated list of keys to include in output of `json` reporter.
-
-
+|`--timeout` | Set a custom test timeout (in ms, default 10000)
+|`-v`, `--version` | Print the current version of test262-harness
+|`--babelPresets` | Babel presets used to transpile code. E.g.: `stage-2`, `stage-3`
+|`-h`, `--help` | Show help
