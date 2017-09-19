@@ -1,0 +1,22 @@
+{
+  "file": "(The value of this property is context-dependent, so it is validated programmatically.)",
+  "contents": "(The value of this property is over-sized, so it is validated independently.)",
+  "attrs": {
+    "description": "Async negative test (Strict Mode)",
+    "negative": {
+      "phase": "runtime",
+      "type": "RangeError"
+    },
+    "flags": {
+      "async": true
+    },
+    "includes": [
+      "assert.js"
+    ]
+  },
+  "async": true,
+  "copyright": "",
+  "isATest": false,
+  "scenario": "strict mode",
+  "strictMode": false
+}

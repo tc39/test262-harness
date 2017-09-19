@@ -16,7 +16,7 @@ const util = require('util');
 const resultsEmitter = require('../lib/resultsEmitter.js');
 const agentPool = require('../lib/agentPool.js');
 const test262Finder = require('../lib/findTest262.js');
-const scenariosForTest = require('../lib/scenarios.js');
+const testObservable = require('../lib/test-observable.js');
 
 // test262 directory (used to locate includes unless overridden with includesDir)
 let test262Dir = argv.test262Dir;
@@ -111,43 +111,35 @@ if (!argv._.length) {
   return;
 }
 
-// Test Pipeline
-const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath,
-                       { timeout: argv.timeout, transpiler });
-const paths = globber(argv._);
-if (!includesDir && !test262Dir) {
-  test262Dir = test262Finder(paths.fileEvents[0]);
-}
-const files = paths.map(pathToTestFile);
-const tests = files.map(compileFile);
-const scenarios = tests.flatMap(scenariosForTest);
-const pairs = Rx.Observable.zip(pool, scenarios);
-const rawResults = pairs.flatMap(pool.runTest).tapOnCompleted(() => pool.destroy());
-const results = rawResults.map(test => {
-  test.result = validator(test);
-  return test;
-});
-const resultEmitter = resultsEmitter(results);
-reporter(resultEmitter, reporterOpts);
+globber(argv._)
+  .reduce((accumulator, path) => accumulator.concat(path), [])
+  .toPromise()
+  .then(paths => {
+    if (!includesDir && !test262Dir) {
+      test262Dir = test262Finder(paths[0]);
+    } else if (!test262Dir) {
+      test262Dir = process.cwd();
+    }
 
-function printVersion() {
-  const p = require(Path.resolve(__dirname, "..", "package.json"));
-  console.log(`v${p.version}`);
-}
+    if (!paths.length) {
+      paths = null;
+    }
 
-function pathToTestFile(path) {
-  return { file: path, contents: fs.readFileSync(path, 'utf-8')};
-}
-
-function compileFile(test) {
-  const endFrontmatterRe = /---\*\/\r?\n/g;
-  const match = endFrontmatterRe.exec(test.contents);
-  if (match) {
-    test.contents = test.contents.slice(0, endFrontmatterRe.lastIndex)
-                    + preludeContents
-                    + test.contents.slice(endFrontmatterRe.lastIndex);
-  } else {
-    test.contents = preludeContents + test.contents;
-  }
-  return compile(test, { test262Dir, includesDir });
-}
+    // Test Pipeline
+    const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath,
+                           { timeout: argv.timeout, transpiler });
+    const scenarios = testObservable(test262Dir, {
+      includesDir,
+      paths,
+      prelude: preludeContents
+    });
+    const pairs = Rx.Observable.zip(pool, scenarios);
+    const rawResults = pairs.flatMap(pool.runTest)
+      .tapOnCompleted(() => pool.destroy());
+    const results = rawResults.map(test => {
+      test.result = validator(test);
+      return test;
+    });
+    const resultEmitter = resultsEmitter(results);
+    reporter(resultEmitter, reporterOpts);
+  });

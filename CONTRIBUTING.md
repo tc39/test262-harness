@@ -21,3 +21,11 @@ project:
     npm test
 
 Please ensure that all tests pass before submitting a patch.
+
+Note that many tests reference static files to determine expected behavior.
+Some changes may modify these expectations. To ease maintenance, these files
+can be automatically updated based on current behavior by setting the
+environment variable named `RECORD` prior to running the tests. On Unix-like
+systems, this can be achieved by running the tests with the following command:
+
+    RECORD=1 npm test

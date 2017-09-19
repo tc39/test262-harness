@@ -1,0 +1,25 @@
+{
+  "file": "(The value of this property is context-dependent, so it is validated programmatically.)",
+  "contents": "(The value of this property is over-sized, so it is validated independently.)",
+  "attrs": {
+    "description": "Should test in both modes (Strict Mode)",
+    "features": [
+      "var",
+      "try",
+      "if"
+    ],
+    "negative": {
+      "phase": "runtime",
+      "type": "ReferenceError"
+    },
+    "flags": {},
+    "includes": [
+      "assert.js"
+    ]
+  },
+  "async": false,
+  "copyright": "",
+  "isATest": false,
+  "scenario": "strict mode",
+  "strictMode": false
+}

@@ -39,3 +39,72 @@ Run `test262-harness --help` for details on the various configuration options.
 |`-v`, `--version` | Print the current version of test262-harness
 |`--babelPresets` | Babel presets used to transpile code. E.g.: `stage-2`, `stage-3`
 |`-h`, `--help` | Show help
+
+## Note.js API
+
+This module also defines a JavaScript API in Node.js.
+
+```js
+var testStream = require('test262-harness').testStream;
+var stream = streamTests('/path/to/test262', {
+    // Directory from which to load "includes" files (defaults to the
+    // appropriate subdirectory of the provided `test262Dir`
+    // Optional. Defaults to './harness'
+    includesDir: '/path/to/includes/dir',
+
+    // File system paths refining the set of tests that should be produced;
+    // only tests whose source file matches one of these values (in the case of
+    // file paths) or is contained by one of these paths (in the case of
+    // directory paths) will be created; all paths are interpreted relative to
+    // the root of the provided `test262Dir`
+    // Optional. Defaults to ['.']
+    paths: ['built-ins/eval', 'language/statements/empty/S12.3_A1.js'],
+
+    // String contents to inject into each test that does not carry the "raw"
+    // metadata flag
+    // Optional. Defaults to the empty string.
+    prelude: 'void void void 0;'
+  });
+
+stream.on('data', function(test) {
+    // the absolute path to the file from which the test was derived
+    console.log(test.file);
+
+    // the complete source text for the test; this contains any "includes"
+    // files specified in the frontmatter, "prelude" content if specified (see
+    // below), and any "scenario" transformations
+    console.log(test.contents);
+
+    // an object representation of the metadata declared in the test's
+    // "frontmatter" section
+    console.log(test.attrs);
+
+    // the licensing information included within the test (if any)
+    console.log(test.copyright);
+
+    // name describing how the source file was interpreted to create the test
+    console.log(test.scenario);
+
+    // *deprecated*; an unreliable indicator of whether the test describes
+    // asynchronous behavior; this information is consistently available in the
+    // `async` metadata flag
+    console.log(async);
+
+    // *deprecated*; an unreliable indicator of whether the object describes a
+    // test; all emitted values describe tests
+    console.log(test.isATest);
+
+    // *deprecated*; indicator of whether a global "use strict" directive was
+    // inserted into the contents; this does *not* definitely describe the
+    // strictness of the code
+    console.log(test.strictMode);
+  });
+
+stream.on('end', function() {
+    console.log('No further tests.');
+  });
+
+stream.on('error', function(err) {
+    console.error('Something went wrong:', err);
+  });
+```

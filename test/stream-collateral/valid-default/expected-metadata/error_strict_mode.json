@@ -1,0 +1,20 @@
+{
+  "file": "(The value of this property is context-dependent, so it is validated programmatically.)",
+  "contents": "(The value of this property is over-sized, so it is validated independently.)",
+  "attrs": {
+    "description": "Fails by calling $ERROR (Strict Mode)",
+    "negative": {
+      "phase": "runtime",
+      "type": "Test262Error"
+    },
+    "flags": {},
+    "includes": [
+      "assert.js"
+    ]
+  },
+  "async": false,
+  "copyright": "",
+  "isATest": false,
+  "scenario": "strict mode",
+  "strictMode": false
+}

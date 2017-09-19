@@ -1,0 +1,15 @@
+{
+  "file": "(The value of this property is context-dependent, so it is validated programmatically.)",
+  "contents": "(The value of this property is over-sized, so it is validated independently.)",
+  "attrs": {
+    "description": "Should not test in strict mode (but allow strict mode to be enabled)",
+    "flags": {
+      "raw": true
+    },
+    "includes": []
+  },
+  "async": false,
+  "copyright": "",
+  "isATest": false,
+  "scenario": "default"
+}
