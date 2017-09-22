@@ -57,8 +57,8 @@ var stream = streamTests('/path/to/test262', {
     // file paths) or is contained by one of these paths (in the case of
     // directory paths) will be created; all paths are interpreted relative to
     // the root of the provided `test262Dir`
-    // Optional. Defaults to ['.']
-    paths: ['built-ins/eval', 'language/statements/empty/S12.3_A1.js'],
+    // Optional. Defaults to ['test']
+    paths: ['test/built-ins/eval', 'test/language/statements/empty/S12.3_A1.js'],
 
     // String contents to inject into each test that does not carry the "raw"
     // metadata flag

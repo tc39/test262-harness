@@ -45,7 +45,7 @@ function makeDataHandler(t, ids, fixtureDir) {
     t.equal(typeof test.scenario, 'string', '`scenario` property is a string value');
     t.ok(scenarios.test(test.scenario), '`scenario` property is a valid value');
 
-    const id = path.relative(path.join(fixtureDir, 'src'), test.file)
+    const id = path.relative(path.join(fixtureDir, 'fake-test262'), test.file)
       .replace(/\.js$/, '_' + test.scenario.replace(' ', '_'));
     const expectedContentFile = path.join(expectedContentDir, id) + '.js';
     const expectedMetadataFile = path.join(expectedMetadataDir, id) + '.json';
@@ -78,7 +78,7 @@ function makeDataHandler(t, ids, fixtureDir) {
 
 tape('valid source directory', t => {
   const fixtureDir = path.join(__dirname, 'stream-collateral', 'valid-default');
-  const stream = streamTests(path.join(fixtureDir, 'src'));
+  const stream = streamTests(path.join(fixtureDir, 'fake-test262'));
   const ids = [];
 
   stream.on('data', makeDataHandler(t, ids, fixtureDir));
@@ -96,8 +96,8 @@ tape('valid source directory', t => {
 
 tape('valid source directory (with paths)', t => {
   const fixtureDir = path.join(__dirname, 'stream-collateral', 'valid-with-paths');
-  const paths = ['bothStrict.js', 'strict/no/*', 'async/*'];
-  const stream = streamTests(path.join(fixtureDir, 'src'), { paths });
+  const paths = ['test/bothStrict.js', 'test/strict/no', 'test/async'];
+  const stream = streamTests(path.join(fixtureDir, 'fake-test262'), { paths });
   const ids = [];
 
   stream.on('data', makeDataHandler(t, ids, fixtureDir));
@@ -128,7 +128,7 @@ tape('valid source directory (with prelude)', t => {
      be: () => modified;${ '   ' }
 
      void "end of prelude";`;
-  const stream = streamTests(path.join(fixtureDir, 'src'), { prelude });
+  const stream = streamTests(path.join(fixtureDir, 'fake-test262'), { prelude });
   const ids = [];
 
   stream.on('data', makeDataHandler(t, ids, fixtureDir));
@@ -147,7 +147,7 @@ tape('valid source directory (with prelude)', t => {
 tape('valid source directory (with custom includes)', t => {
   const fixtureDir = path.join(__dirname, 'stream-collateral', 'valid-with-includes');
   const includesDir = path.join(fixtureDir, 'custom-includes');
-  const stream = streamTests(path.join(fixtureDir, 'src'), { includesDir });
+  const stream = streamTests(path.join(fixtureDir, 'fake-test262'), { includesDir });
   const ids = [];
 
   stream.on('data', makeDataHandler(t, ids, fixtureDir));
