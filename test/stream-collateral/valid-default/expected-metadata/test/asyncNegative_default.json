@@ -1,5 +1,5 @@
 {
-  "file": "(The value of this property is context-dependent, so it is validated programmatically.)",
+  "file": "test/asyncNegative.js",
   "contents": "(The value of this property is over-sized, so it is validated independently.)",
   "attrs": {
     "description": "Async negative test",

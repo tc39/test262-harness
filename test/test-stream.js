@@ -14,13 +14,14 @@ const RECORDING = !!process.env.RECORD;
 // inconsequential; they have been selected to aid in discoverability in the
 // programatically-generated "expectations" files.
 const blankOut = {
-  file: '(The value of this property is context-dependent, so it is validated programmatically.)',
   contents: '(The value of this property is over-sized, so it is validated independently.)'
 };
 
 function makeDataHandler(t, ids, fixtureDir) {
+  const test262Dir = path.join(fixtureDir, 'fake-test262');
   const expectedContentDir = path.join(fixtureDir, 'expected-content');
   const expectedMetadataDir = path.join(fixtureDir, 'expected-metadata');
+
   if (RECORDING) {
     rimraf.sync(expectedContentDir);
     rimraf.sync(expectedMetadataDir);
@@ -35,7 +36,7 @@ function makeDataHandler(t, ids, fixtureDir) {
     const actualContents = test.contents;
     const actualMetadata = Object.assign({}, test, blankOut);
 
-    if (!fs.existsSync(test.file)) {
+    if (!fs.existsSync(path.join(test262Dir, test.file))) {
       t.ok(false, 'Source file does not exist: ' + test.file);
       return;
     }
@@ -45,8 +46,7 @@ function makeDataHandler(t, ids, fixtureDir) {
     t.equal(typeof test.scenario, 'string', '`scenario` property is a string value');
     t.ok(scenarios.test(test.scenario), '`scenario` property is a valid value');
 
-    const id = path.relative(path.join(fixtureDir, 'fake-test262'), test.file)
-      .replace(/\.js$/, '_' + test.scenario.replace(' ', '_'));
+    const id = test.file.replace(/\.js$/, '_' + test.scenario.replace(' ', '_'));
     const expectedContentFile = path.join(expectedContentDir, id) + '.js';
     const expectedMetadataFile = path.join(expectedMetadataDir, id) + '.json';
 
