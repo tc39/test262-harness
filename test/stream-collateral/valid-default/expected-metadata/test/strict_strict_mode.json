@@ -17,5 +17,5 @@
   "async": false,
   "copyright": "",
   "isATest": false,
-  "scenario": "default"
+  "scenario": "strict mode"
 }
