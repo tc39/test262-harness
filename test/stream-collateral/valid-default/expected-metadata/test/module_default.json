@@ -1,0 +1,18 @@
+{
+  "file": "test/module.js",
+  "contents": "(The value of this property is over-sized, so it is validated independently.)",
+  "attrs": {
+    "description": "A test for module code",
+    "flags": {
+      "module": true
+    },
+    "includes": [
+      "assert.js"
+    ]
+  },
+  "async": false,
+  "copyright": "",
+  "isATest": false,
+  "scenario": "default",
+  "strictMode": false
+}

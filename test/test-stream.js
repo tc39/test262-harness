@@ -89,7 +89,7 @@ tape('valid source directory', t => {
   });
 
   stream.on('end', () => {
-    t.equal(ids.length, 14, 'Reports every available test');
+    t.equal(ids.length, 16, 'Reports every available test');
     t.end();
   });
 });
