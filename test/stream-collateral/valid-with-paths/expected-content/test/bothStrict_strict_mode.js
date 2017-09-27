@@ -1,5 +1,5 @@
 "use strict";
- function Test262Error(message) {
+function Test262Error(message) {
     if (message) this.message = message;
 }
 
