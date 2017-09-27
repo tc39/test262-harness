@@ -1,0 +1,20 @@
+{
+  "file": "test/error.js",
+  "contents": "(The value of this property is over-sized, so it is validated independently.)",
+  "attrs": {
+    "description": "Fails by calling $ERROR",
+    "negative": {
+      "phase": "runtime",
+      "type": "Test262Error"
+    },
+    "flags": {},
+    "includes": [
+      "assert.js"
+    ]
+  },
+  "async": false,
+  "copyright": "",
+  "isATest": false,
+  "scenario": "default",
+  "strictMode": false
+}

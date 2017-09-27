@@ -1,0 +1,15 @@
+{
+  "file": "test/strict/no/rawNoStrict.js",
+  "contents": "(The value of this property is over-sized, so it is validated independently.)",
+  "attrs": {
+    "description": "Should not test in strict mode",
+    "flags": {
+      "raw": true
+    },
+    "includes": []
+  },
+  "async": false,
+  "copyright": "",
+  "isATest": false,
+  "scenario": "default"
+}

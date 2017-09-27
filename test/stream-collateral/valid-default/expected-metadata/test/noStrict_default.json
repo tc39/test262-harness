@@ -1,0 +1,17 @@
+{
+  "file": "test/noStrict.js",
+  "contents": "(The value of this property is over-sized, so it is validated independently.)",
+  "attrs": {
+    "description": "Should not test in strict mode",
+    "flags": {
+      "noStrict": true
+    },
+    "includes": [
+      "assert.js"
+    ]
+  },
+  "async": false,
+  "copyright": "",
+  "isATest": false,
+  "scenario": "default"
+}
