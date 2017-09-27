@@ -5,7 +5,7 @@ const path = require('path');
 const rimraf = require('rimraf');
 const tape = require('tape');
 
-const streamTests = require('..').streamTests;
+const TestStream = require('..').TestStream;
 const scenarios = /^(strict mode|default)$/;
 
 const RECORDING = !!process.env.RECORD;
@@ -78,7 +78,7 @@ function makeDataHandler(t, ids, fixtureDir) {
 
 tape('valid source directory', t => {
   const fixtureDir = path.join(__dirname, 'stream-collateral', 'valid-default');
-  const stream = streamTests(path.join(fixtureDir, 'fake-test262'));
+  const stream = new TestStream(path.join(fixtureDir, 'fake-test262'));
   const ids = [];
 
   stream.on('data', makeDataHandler(t, ids, fixtureDir));
@@ -97,7 +97,7 @@ tape('valid source directory', t => {
 tape('valid source directory (with paths)', t => {
   const fixtureDir = path.join(__dirname, 'stream-collateral', 'valid-with-paths');
   const paths = ['test/bothStrict.js', 'test/strict/no', 'test/async'];
-  const stream = streamTests(path.join(fixtureDir, 'fake-test262'), { paths });
+  const stream = new TestStream(path.join(fixtureDir, 'fake-test262'), { paths });
   const ids = [];
 
   stream.on('data', makeDataHandler(t, ids, fixtureDir));
@@ -128,7 +128,7 @@ tape('valid source directory (with prelude)', t => {
      be: () => modified;${ '   ' }
 
      void "end of prelude";`;
-  const stream = streamTests(path.join(fixtureDir, 'fake-test262'), { prelude });
+  const stream = new TestStream(path.join(fixtureDir, 'fake-test262'), { prelude });
   const ids = [];
 
   stream.on('data', makeDataHandler(t, ids, fixtureDir));
@@ -147,7 +147,7 @@ tape('valid source directory (with prelude)', t => {
 tape('valid source directory (with custom includes)', t => {
   const fixtureDir = path.join(__dirname, 'stream-collateral', 'valid-with-includes');
   const includesDir = path.join(fixtureDir, 'custom-includes');
-  const stream = streamTests(path.join(fixtureDir, 'fake-test262'), { includesDir });
+  const stream = new TestStream(path.join(fixtureDir, 'fake-test262'), { includesDir });
   const ids = [];
 
   stream.on('data', makeDataHandler(t, ids, fixtureDir));
@@ -164,7 +164,7 @@ tape('valid source directory (with custom includes)', t => {
 });
 
 tape('missing `assert.js`', t => {
-  const stream = streamTests(path.join(__dirname, 'stream-collateral', 'invalid-missing-harness'));
+  const stream = new TestStream(path.join(__dirname, 'stream-collateral', 'invalid-missing-harness'));
 
   stream.on('data', () => {
     t.end(new Error('Stream should not emit a `data` event'));
@@ -181,7 +181,7 @@ tape('missing `assert.js`', t => {
 });
 
 tape.skip('non-existent source directory', t => {
-  const stream = streamTests(path.join(__dirname, 'stream-collateral', 'this-directory-does-not-exist'));
+  const stream = new TestStream(path.join(__dirname, 'stream-collateral', 'this-directory-does-not-exist'));
 
   stream.on('data', () => {
     t.end(new Error('Stream should not emit a `data` event'));
