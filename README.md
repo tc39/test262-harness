@@ -45,8 +45,8 @@ Run `test262-harness --help` for details on the various configuration options.
 This module also defines a JavaScript API in Node.js.
 
 ```js
-var testStream = require('test262-harness').testStream;
-var stream = streamTests('/path/to/test262', {
+var TestStream = require('test262-harness').TestStream;
+var stream = new TestStream('/path/to/test262', {
     // Directory from which to load "includes" files (defaults to the
     // appropriate subdirectory of the provided `test262Dir`
     // Optional. Defaults to './harness'
