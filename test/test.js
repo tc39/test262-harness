@@ -5,7 +5,7 @@ const cp = require('child_process');
 
 Promise.all([
   run(['test/collateral/**/*.js']),
-  run(['--prelude', './test/test-prelude.js', 'test/collateral/bothStrict.js']),
+  run(['--prelude', './test/fixtures/prelude.js', 'test/collateral/bothStrict.js']),
   run(['--reporter-keys', 'attrs,result', 'test/collateral/bothStrict.js']),
   run(['--reporter-keys', 'rawResult,attrs,result', 'test/collateral/bothStrict.js']),
   run(['--reporter-keys', 'attrs,rawResult,result', 'test/collateral/bothStrict.js']),
