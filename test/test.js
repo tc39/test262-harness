@@ -52,8 +52,11 @@ function run(extraArgs) {
 
 function validate(records) {
   const [
-    normal, prelude, withoutRawResult, withRawResult1, withRawResult2,
-    withRawResult3, babelResult
+    normal,
+    prelude,
+    withoutRawResult,
+    withRawResult1, withRawResult2, withRawResult3,
+    babelResult
   ] = records;
   validateResultRecords(normal);
   validateResultRecords(prelude, { prelude: true });
@@ -72,6 +75,15 @@ function validateResultRecords(records, options = { prelude: false }) {
       record.attrs.description;
 
     tape(description, test => {
+
+      if (typeof record.strictMode !== 'undefined') {
+        if (record.contents.startsWith('"use strict"')) {
+          test.equal(record.strictMode, true);
+        } else {
+          test.equal(record.strictMode, false);
+        }
+      }
+
       test.assert(record.attrs.expected, 'Test has an "expected" frontmatter');
       if (!record.attrs.expected) {
         // can't do anything else
