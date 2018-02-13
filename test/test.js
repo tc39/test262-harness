@@ -1,4 +1,4 @@
-const tape = require('tape');
+const tap = require('tap');
 const fs = require('fs');
 const path = require('path');
 const cp = require('child_process');
@@ -16,7 +16,7 @@ Promise.all([
 .catch(reportRunError);
 
 function reportRunError(error) {
-  console.error("Error running tests");
+  console.error('Error running tests');
   console.error(error.stack);
   process.exit(1);
 }
@@ -74,7 +74,7 @@ function validateResultRecords(records, options = { prelude: false }) {
       `${record.attrs.description} with prelude` :
       record.attrs.description;
 
-    tape(description, test => {
+    tap.test(description, test => {
 
       if (typeof record.strictMode !== 'undefined') {
         if (record.contents.startsWith('"use strict"')) {
