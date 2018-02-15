@@ -63,6 +63,7 @@ if (argv.prelude) {
 // If using default hostType, hostPath defaults to the current node executable location.
 let hostType;
 let hostPath;
+let features;
 
 if (argv.hostType) {
   hostType = argv.hostType;
@@ -104,6 +105,10 @@ if (argv.babelPresets) {
   transpiler = code => babel.transform(code, { presets }).code;
 }
 
+if (argv.features) {
+  features = argv.features.split(',').map(feature => feature.trim());
+}
+
 // Show help if no arguments provided
 if (!argv._.length) {
   cli.showHelp();
@@ -115,11 +120,12 @@ if (!argv._.length) {
 const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath,
                        { timeout: argv.timeout, transpiler });
 const paths = globber(argv._);
+
 if (!includesDir && !test262Dir) {
   test262Dir = test262Finder(paths.fileEvents[0]);
 }
 const files = paths.map(pathToTestFile);
-const tests = files.map(compileFile);
+const tests = files.map(compileFile).filter(hasFeatures);
 const scenarios = tests.flatMap(scenariosForTest);
 const pairs = Rx.Observable.zip(pool, scenarios);
 const rawResults = pairs.flatMap(pool.runTest).tapOnCompleted(() => pool.destroy());
@@ -137,6 +143,13 @@ function printVersion() {
 
 function pathToTestFile(path) {
   return { file: path, contents: fs.readFileSync(path, 'utf-8')};
+}
+
+function hasFeatures(test) {
+  if (!features) {
+    return true;
+  }
+  return features.filter(feature => (test.attrs.features || []).includes(feature)).length > 0;
 }
 
 function compileFile(test) {
