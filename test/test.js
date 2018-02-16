@@ -76,11 +76,11 @@ function validateResultRecords(records, options = { prelude: false }) {
 
     tap.test(description, test => {
 
-      if (typeof record.strictMode !== 'undefined') {
+      if (typeof record.scenario !== 'undefined') {
         if (record.contents.startsWith('"use strict"')) {
-          test.equal(record.strictMode, true);
+          test.equal(record.scenario, 'strict mode');
         } else {
-          test.equal(record.strictMode, false);
+          test.equal(record.scenario, 'default');
         }
       }
 
