@@ -15,7 +15,7 @@
     "babel-preset-stage-2": "^6.24.1",
     "babel-preset-stage-3": "^6.24.1",
     "chalk": "^1.1.3",
-    "eshost": "^3.6.0",
+    "eshost": "^3.9.0",
     "glob": "^7.0.5",
     "rx": "^4.1.0",
     "test262-compiler": "^3.0.0",
