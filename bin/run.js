@@ -13,11 +13,9 @@ const Rx = require('rx');
 
 const agentPool = require('../lib/agentPool.js');
 const cli = require('../lib/cli.js');
-const compiler = require('../lib/compiler.js');
 const test262Finder = require('../lib/findTest262.js');
-const globber = require('../lib/globber.js');
+const testStream = require('../lib/test-stream');
 const resultsEmitter = require('../lib/resultsEmitter.js');
-const scenariosForTest = require('../lib/scenarios.js');
 const validator = require('../lib/validator.js');
 
 const argv = cli.argv;
@@ -138,15 +136,13 @@ if (!argv._.length) {
 // Test Pipeline
 const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath,
                        { timeout: argv.timeout, transpiler });
-const paths = globber(argv._, {
-  ignore: [
-    '**/*_FIXTURE.js'
-  ]
-});
 
 if (!test262Dir) {
-  test262Dir = test262Finder(paths.fileEvents[0]);
+  test262Dir = test262Finder(argv._[0]);
 }
+reporterOpts.test262Dir = test262Dir;
+const remove = path.relative(process.cwd(), test262Dir);
+argv._ = argv._.map(p => path.relative(remove, p));
 
 let test262Version;
 try {
@@ -167,10 +163,10 @@ if (acceptVersion ? acceptVersion !== test262Version :
   return;
 }
 
-const files = paths.map(pathToTestRecord);
-const tests = files.map(compileFile).filter(hasFeatures);
-const scenarios = tests.flatMap(scenariosForTest);
-const pairs = Rx.Observable.zip(pool, scenarios);
+const tests = testStream(test262Dir, includesDir, acceptVersion, argv._)
+  .map(insertPrelude)
+  .filter(hasFeatures);
+const pairs = Rx.Observable.zip(pool, tests);
 const rawResults = pairs.flatMap(pool.runTest).tapOnCompleted(() => pool.destroy());
 const results = rawResults.map(test => {
   test.result = validator(test);
@@ -184,8 +180,19 @@ function printVersion() {
   console.log(`v${p.version}`);
 }
 
-function pathToTestRecord(file) {
-  return { file, contents: fs.readFileSync(file, 'utf8') };
+function insertPrelude(test) {
+  const index = test.insertionIndex;
+  if (index === -1) {
+    return test;
+  }
+
+  if (preludeContents) {
+    test.contents = test.contents.slice(0, index) +
+      preludeContents +
+      test.contents.slice(index);
+  }
+
+  return test;
 }
 
 function hasFeatures(test) {
@@ -193,18 +200,4 @@ function hasFeatures(test) {
     return true;
   }
   return features.filter(feature => (test.attrs.features || []).includes(feature)).length > 0;
-}
-
-function compileFile(test) {
-  const endFrontmatterRe = /---\*\/\r?\n/g;
-  const match = endFrontmatterRe.exec(test.contents);
-  if (match) {
-    test.contents = test.contents.slice(0, endFrontmatterRe.lastIndex)
-                    + preludeContents
-                    + test.contents.slice(endFrontmatterRe.lastIndex);
-  } else {
-    test.contents = preludeContents + test.contents;
-  }
-
-  return compiler(test, { test262Dir, includesDir });
 }
