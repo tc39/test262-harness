@@ -40,3 +40,4 @@ Run `test262-harness --help` for details on the various configuration options.
 |`-v`, `--version` | Print the current version of test262-harness
 |`--babelPresets` | Babel presets used to transpile code. E.g.: `stage-2`, `stage-3`
 |`-h`, `--help` | Show help
+| `--acceptVersion` | Optional. Execute tests from a version of Test262 that differs from the versions supported by this utility. This may cause the utility to report invalid test results.

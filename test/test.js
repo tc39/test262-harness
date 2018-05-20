@@ -4,13 +4,13 @@ const path = require('path');
 const cp = require('child_process');
 
 Promise.all([
-  run(['test/collateral/**/*.js']),
-  run(['--prelude', './test/fixtures/prelude.js', 'test/collateral/bothStrict.js']),
-  run(['--reporter-keys', 'attrs,result', 'test/collateral/bothStrict.js']),
-  run(['--reporter-keys', 'rawResult,attrs,result', 'test/collateral/bothStrict.js']),
-  run(['--reporter-keys', 'attrs,rawResult,result', 'test/collateral/bothStrict.js']),
-  run(['--reporter-keys', 'attrs,result,rawResult', 'test/collateral/bothStrict.js']),
-  run(['--babelPresets', 'stage-3', '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/spread-sngl-obj-ident.js'])
+  run(['test/collateral/test/**/*.js']),
+  run(['--prelude', './test/fixtures/prelude.js', 'test/collateral/test/bothStrict.js']),
+  run(['--reporter-keys', 'attrs,result', 'test/collateral/test/bothStrict.js']),
+  run(['--reporter-keys', 'rawResult,attrs,result', 'test/collateral/test/bothStrict.js']),
+  run(['--reporter-keys', 'attrs,rawResult,result', 'test/collateral/test/bothStrict.js']),
+  run(['--reporter-keys', 'attrs,result,rawResult', 'test/collateral/test/bothStrict.js']),
+  run(['--babelPresets', 'stage-3', '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/test/spread-sngl-obj-ident.js'])
 ])
 .then(validate)
 .catch(reportRunError);
