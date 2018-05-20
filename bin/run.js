@@ -3,6 +3,7 @@
 // Copyright (C) 2014, Microsoft Corporation. All rights reserved.
 // This code is governed by the BSD License found in the LICENSE file.
 const DEFAULT_TEST_TIMEOUT = 10000;
+const ACCEPTED_TEST262_VERSIONS = /^[1-3]\./
 
 const compile = require('test262-compiler');
 const fs = require('fs');
@@ -22,6 +23,7 @@ const scenariosForTest = require('../lib/scenarios.js');
 let test262Dir = argv.test262Dir;
 // where to load includes from (usually a subdirectory of test262dir)
 let includesDir = argv.includesDir;
+let acceptVersion = argv.acceptVersion;
 
 // print version of test262-harness
 if (argv.version) {
@@ -125,9 +127,25 @@ const paths = globber(argv._, {
   ]
 });
 
-if (!includesDir && !test262Dir) {
+if (!test262Dir) {
   test262Dir = test262Finder(paths.fileEvents[0]);
 }
+
+let test262Version;
+try {
+  test262Version = require(Path.join(test262Dir, 'package.json')).version;
+} catch (err) {
+  console.error('Unable to detect version of test262: ' + err);
+  process.exitCode = 1;
+  return;
+}
+
+if (!ACCEPTED_TEST262_VERSIONS.test(test262Version)) {
+  console.error('Incompatible test262 version: ' + test262Version);
+  process.exitCode = 1;
+  return;
+}
+
 const files = paths.map(pathToTestFile);
 const tests = files.map(compileFile).filter(hasFeatures);
 const scenarios = tests.flatMap(scenariosForTest);
