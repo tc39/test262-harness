@@ -53,6 +53,13 @@ if (argv.reporterKeys) {
   reporterOpts.reporterKeys = argv.reporterKeys.split(',');
 }
 
+if (argv.saveCompiledTests) {
+  reporterOpts.saveCompiledTests = argv.saveCompiledTests;
+  if (argv.saveOnlyFailed) {
+    reporterOpts.saveOnlyFailed = argv.saveOnlyFailed;
+  }
+}
+
 // load preload contents
 let preludeContents;
 if (argv.prelude) {
@@ -85,6 +92,10 @@ if (argv.hostType) {
   } else {
     hostPath = process.execPath;
   }
+}
+
+if (hostType) {
+  reporterOpts.hostType = hostType;
 }
 
 argv.timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
