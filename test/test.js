@@ -98,7 +98,7 @@ function validateResultRecords(records, options = { prelude: false }) {
       }
 
       if (options.prelude) {
-        test.assert(record.rawResult.stdout.indexOf("prelude!") > -1, 'Has prelude content');
+        test.assert(record.rawResult.stdout.indexOf('prelude!') > -1, 'Has prelude content');
       }
 
       if (options.noRawResult) {

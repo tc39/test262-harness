@@ -119,7 +119,11 @@ if (!argv._.length) {
 // Test Pipeline
 const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath,
                        { timeout: argv.timeout, transpiler });
-const paths = globber(argv._);
+const paths = globber(argv._, {
+  ignore: [
+    '**/*_FIXTURE.js'
+  ]
+});
 
 if (!includesDir && !test262Dir) {
   test262Dir = test262Finder(paths.fileEvents[0]);
