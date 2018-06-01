@@ -1,5 +1,7 @@
 ## Test262-Harness
 
+[![Travis Build Status](https://travis-ci.org/bterlson/test262-harness.svg?branch=master)](https://travis-ci.org/bterlson/test262-harness)
+
 An experimental Node-based test262 harness. Once this harness has stabilized, I plan to push to include it by default in official test262.
 
 Requires Node 6 or above.
