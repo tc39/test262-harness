@@ -3,18 +3,17 @@ const validator = require('../lib/validator');
 
 const fixture = {
   file: 'foo.js',
-  contents: '$DONE();',
+  contents: '1+1;',
   attrs: {
     esid: 'sec-foo',
     description: 'Foo. (Strict Mode)',
     info: 'Foo',
     includes: ['assert.js'],
-    flags: {}
+    flags: {
+
+    }
   },
-  async: false,
   copyright: '// Copyright (C) 2017 Some Person. All rights reserved.\n// This code is governed by the BSD license found in the LICENSE file.\n',
-  isATest: true,
-  strictMode: false,
   rawResult: {}
 };
 
@@ -26,9 +25,9 @@ tap.test('timeout reported', assert => {
     timeout: true
   };
   const test = Object.assign({}, fixture, { rawResult });
-  const validation = validator(test);
-  assert.equal(validation.pass, false);
-  assert.equal(validation.message, 'Test timed out');
+  const validated = validator(test);
+  assert.equal(validated.pass, false);
+  assert.equal(validated.message, 'Test timed out');
   assert.end();
 });
 
@@ -39,9 +38,9 @@ tap.test('stderr reported', assert => {
     error: null
   };
 
-  const validation = validator(Object.assign({}, fixture, { rawResult }));
-  assert.equal(validation.pass, false);
-  assert.equal(validation.message, '/foo/bar/node: bad option: --bogus_v8_option\n');
+  const validated = validator(Object.assign({}, fixture, { rawResult }));
+  assert.equal(validated.pass, false);
+  assert.equal(validated.message, '/foo/bar/node: bad option: --bogus_v8_option\n');
   assert.end();
 });
 
@@ -55,9 +54,9 @@ tap.test('Test262Error reported', assert => {
     },
   };
   const test = Object.assign({}, fixture, { rawResult });
-  const validation = validator(test);
-  assert.equal(validation.pass, false);
-  assert.equal(validation.message, 'Some Test262Error Error');
+  const validated = validator(test);
+  assert.equal(validated.pass, false);
+  assert.equal(validated.message, 'Some Test262Error Error');
   assert.end();
 });
 
@@ -71,62 +70,52 @@ tap.test('Expecting no error reported', assert => {
     },
   };
   const test = Object.assign({}, fixture, { rawResult });
-  const validation = validator(test);
-  assert.equal(validation.pass, false);
-  assert.equal(validation.message, 'Expected no error, got SyntaxError: Some SyntaxError Error');
+  const validated = validator(test);
+  assert.equal(validated.pass, false);
+  assert.equal(validated.message, 'Expected no error, got SyntaxError: Some SyntaxError Error');
   assert.end();
 });
 
-tap.test('Ran to finish (pass)', assert => {
+tap.test('attrs.flags.async: true (pass)', assert => {
   const rawResult = {
     stderr: '',
-    stdout: 'test262/done',
-    error: null,
-  };
-  const test = Object.assign({}, fixture, { rawResult });
-  const validation = validator(test);
-  assert.equal(validation.pass, true);
-  assert.equal(validation.message, undefined);
-  assert.end();
-});
-
-tap.test('attrs.flags: negative (pass)', assert => {
-  const rawResult = {
-    stderr: '',
-    stdout: '',
-    error: 'Some error message that is not known',
-  };
-
-  const attrs = Object.assign({}, fixture.attrs, {
-    flags: {
-      negative: true,
-    }
-  });
-
-  const test = Object.assign({}, fixture, { attrs, rawResult });
-  const validation = validator(test);
-  assert.equal(validation.pass, true);
-  assert.equal(validation.message, undefined);
-  assert.end();
-});
-
-tap.test('attrs.flags: negative (fail)', assert => {
-  const rawResult = {
-    stderr: '',
-    stdout: '',
+    stdout: 'Test262:AsyncTestComplete',
     error: null,
   };
 
   const attrs = Object.assign({}, fixture.attrs, {
     flags: {
-      negative: true,
+      async: true,
     }
   });
 
   const test = Object.assign({}, fixture, { attrs, rawResult });
-  const validation = validator(test);
-  assert.equal(validation.pass, false);
-  assert.equal(validation.message, 'Expected test to throw some error');
+  const validated = validator(test);
+  assert.equal(validated.pass, true);
+  assert.equal(validated.message, undefined);
+  assert.end();
+});
+
+tap.test('attrs.flags.async: true (fail)', assert => {
+  const rawResult = {
+    stderr: '',
+    stdout: '',
+    error: {
+      name: 'RangeError',
+      message: 'Something bad happened... asynchronously'
+    },
+  };
+
+  const attrs = Object.assign({}, fixture.attrs, {
+    flags: {
+      async: true,
+    }
+  });
+
+  const test = Object.assign({}, fixture, { attrs, rawResult });
+  const validated = validator(test);
+  assert.equal(validated.pass, false);
+  assert.equal(validated.message, 'Expected no error, got RangeError: Something bad happened... asynchronously');
   assert.end();
 });
 

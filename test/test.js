@@ -10,7 +10,7 @@ Promise.all([
   run(['--reporter-keys', 'rawResult,attrs,result', 'test/collateral/test/bothStrict.js']),
   run(['--reporter-keys', 'attrs,rawResult,result', 'test/collateral/test/bothStrict.js']),
   run(['--reporter-keys', 'attrs,result,rawResult', 'test/collateral/test/bothStrict.js']),
-  run(['--babelPresets', 'stage-3', '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/test/spread-sngl-obj-ident.js'])
+  run(['--babelPresets', 'stage-3', '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/test/spread-sngl-obj-ident.js']),
 ])
 .then(validate)
 .catch(reportRunError);

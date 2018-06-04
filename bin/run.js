@@ -5,19 +5,22 @@
 const DEFAULT_TEST_TIMEOUT = 10000;
 const ACCEPTED_TEST262_VERSIONS = /^[1-3]\./
 
-const compile = require('test262-compiler');
 const fs = require('fs');
 const Path = require('path');
+const util = require('util');
+
+const Rx = require('rx');
+
+const compiler = require('../lib/compiler.js');
 const globber = require('../lib/globber.js');
 const cli = require('../lib/cli.js');
-const argv = cli.argv;
 const validator = require('../lib/validator.js');
-const Rx = require('rx');
-const util = require('util');
 const resultsEmitter = require('../lib/resultsEmitter.js');
 const agentPool = require('../lib/agentPool.js');
 const test262Finder = require('../lib/findTest262.js');
 const scenariosForTest = require('../lib/scenarios.js');
+
+const argv = cli.argv;
 
 // test262 directory (used to locate includes unless overridden with includesDir)
 let test262Dir = argv.test262Dir;
@@ -184,5 +187,5 @@ function compileFile(test) {
   } else {
     test.contents = preludeContents + test.contents;
   }
-  return compile(test, { test262Dir, includesDir });
+  return compiler(test, { test262Dir, includesDir });
 }
