@@ -15,9 +15,10 @@ Promise.all([
 .then(validate)
 .catch(reportRunError);
 
-function reportRunError(error) {
+function reportRunError(report) {
   console.error('Error running tests');
-  console.error(error.stack);
+  console.error(report.rejection.stack);
+  console.error(`Args: ${report.context.args.join(' ')}`);
   process.exit(1);
 }
 
@@ -38,7 +39,12 @@ function run(extraArgs) {
     child.stderr.on('data', (data) => { stderr += data });
     child.on('exit', () => {
       if (stderr) {
-        return reject(new Error(`Got stderr: ${stderr.toString()}`));
+        return reject({
+          rejection: new Error(`Got stderr: ${stderr.toString()}`),
+          context: {
+            args
+          }
+        });
       }
 
       try {
