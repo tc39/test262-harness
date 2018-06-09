@@ -7,14 +7,23 @@ const glob = require('glob');
 
 const parseFile = require('test262-parser').parseFile;
 
+const binPath = path.join(__dirname, '..', 'bin', 'run.js');
+
 const tests = [
-  [['test/collateral/test/**/*.js']],
-  [['--prelude', './test/fixtures/prelude.js', 'test/collateral/test/bothStrict.js'], { prelude: true }],
-  [['--reporter-keys', 'attrs,result', 'test/collateral/test/bothStrict.js'], { noRawResult: true }],
-  [['--reporter-keys', 'rawResult,attrs,result', 'test/collateral/test/bothStrict.js']],
-  [['--reporter-keys', 'attrs,rawResult,result', 'test/collateral/test/bothStrict.js']],
-  [['--reporter-keys', 'attrs,result,rawResult', 'test/collateral/test/bothStrict.js']],
-  [['--babelPresets', 'stage-3', '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/test/spread-sngl-obj-ident.js']]
+  [['test/**/*.js'], { cwd: 'test/collateral-with-harness/test262' }],
+  [['--test262Dir', './test/collateral-with-harness/test262', 'test/collateral-with-harness/test262/test/**/*.js']],
+  [['--test262Dir', './test/collateral-with-harness/test262', 'test/collateral-with-harness/test262/test/**/*.js', 'test/collateral-with-harness/loose-tests/*']],
+  [['--test262Dir', './collateral-with-harness/test262', 'collateral-with-harness/test262/test/**/*.js'], { cwd: 'test' }],
+  [['--includesDir', './test/test-includes', 'test/collateral/test/**/*.js']],
+  [['test/collateral-with-harness/test262/test/**/*.js']],
+  [['--includesDir', './test-includes', 'collateral/test/**/*.js'], { cwd: 'test' }],
+  [['collateral-with-harness/test262/test/**/*.js'], { cwd: 'test' }],
+  [['--includesDir', './test/test-includes', '--prelude', './test/fixtures/prelude.js', 'test/collateral/test/bothStrict.js'], { prelude: true }],
+  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result', 'test/collateral/test/bothStrict.js'], { noRawResult: true }],
+  [['--includesDir', './test/test-includes', '--reporter-keys', 'rawResult,attrs,result', 'test/collateral/test/bothStrict.js']],
+  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,rawResult,result', 'test/collateral/test/bothStrict.js']],
+  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result,rawResult', 'test/collateral/test/bothStrict.js']],
+  [['--includesDir', './test/test-includes', '--babelPresets', 'stage-3', '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/test/spread-sngl-obj-ident.js']]
 ];
 
 Promise.all(tests.map(args => run(...args).then(validate)))
@@ -34,10 +43,10 @@ function run(extraArgs, options) {
         '--hostType', 'node',
         '--hostPath', process.execPath,
         '-r', 'json',
-        '--includesDir', './test/test-includes',
       ].concat(extraArgs);
+    let cwd = options && options.cwd;
 
-    const child = cp.fork('bin/run.js', args, { silent: true });
+    const child = cp.fork(binPath, args, { cwd, silent: true });
 
     child.stdout.on('data', (data) => { stdout += data });
     child.stderr.on('data', (data) => { stderr += data });
@@ -146,7 +155,7 @@ tap.test('saving compiled tests', assert => {
   const sources = glob.sync(sourcepattern);
 
   tap.test('save all compiled tests with `--saveCompiledTests`', assert => {
-    run([sourcepattern, '--saveCompiledTests'])
+    run(['--includesDir', './test/test-includes', sourcepattern, '--saveCompiledTests'])
       .catch(assert.fail)
       .then(() => {
         const results = glob.sync(resultpattern);
@@ -160,7 +169,7 @@ tap.test('saving compiled tests', assert => {
 
   tap.test('save failed compiled tests with `--saveCompiledTests --saveOnlyFailed`', assert => {
 
-    run([sourcepattern, '--saveCompiledTests', '--saveOnlyFailed'])
+    run(['--includesDir', './test/test-includes', sourcepattern, '--saveCompiledTests', '--saveOnlyFailed'])
       .catch(assert.fail)
       .then(() => {
         const results = glob.sync(resultpattern);
@@ -174,7 +183,7 @@ tap.test('saving compiled tests', assert => {
 
   tap.test('save failed compiled tests with `--saveOnlyFailed` (implies `--saveCompiledTests`)', assert => {
 
-    run([sourcepattern, '--saveOnlyFailed'])
+    run(['--includesDir', './test/test-includes', sourcepattern, '--saveOnlyFailed'])
       .catch(assert.fail)
       .then(() => {
         const results = glob.sync(resultpattern);
