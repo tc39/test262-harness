@@ -18,7 +18,7 @@
     "eshost": "^4.0.0",
     "glob": "^7.0.5",
     "rx": "^4.1.0",
-    "test262-compiler": "^3.0.0",
+    "test262-parser": "^2.0.7",
     "yargs": "^4.7.1"
   },
   "author": "Brian Terlson",

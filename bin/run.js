@@ -5,19 +5,22 @@
 const DEFAULT_TEST_TIMEOUT = 10000;
 const ACCEPTED_TEST262_VERSIONS = /^[1-3]\./
 
-const compile = require('test262-compiler');
 const fs = require('fs');
-const Path = require('path');
-const globber = require('../lib/globber.js');
-const cli = require('../lib/cli.js');
-const argv = cli.argv;
-const validator = require('../lib/validator.js');
-const Rx = require('rx');
+const path = require('path');
 const util = require('util');
-const resultsEmitter = require('../lib/resultsEmitter.js');
+
+const Rx = require('rx');
+
 const agentPool = require('../lib/agentPool.js');
+const cli = require('../lib/cli.js');
+const compiler = require('../lib/compiler.js');
 const test262Finder = require('../lib/findTest262.js');
+const globber = require('../lib/globber.js');
+const resultsEmitter = require('../lib/resultsEmitter.js');
 const scenariosForTest = require('../lib/scenarios.js');
+const validator = require('../lib/validator.js');
+
+const argv = cli.argv;
 
 // test262 directory (used to locate includes unless overridden with includesDir)
 let test262Dir = argv.test262Dir;
@@ -35,7 +38,7 @@ if (argv.version) {
 // defaults to 'simple'
 let reporter;
 let reporterOpts = {};
-if (fs.existsSync(Path.join(__dirname, '../lib/reporters', `${argv.reporter}.js`))) {
+if (fs.existsSync(path.join(__dirname, '../lib/reporters', `${argv.reporter}.js`))) {
   reporter = require(`../lib/reporters/${argv.reporter}.js`);
 } else {
   console.error(`Reporter ${argv.reporter} not found.`);
@@ -54,11 +57,9 @@ if (argv.reporterKeys) {
 }
 
 // load preload contents
-let preludeContents;
+let preludeContents = '';
 if (argv.prelude) {
   preludeContents = fs.readFileSync(argv.prelude, 'utf8');
-} else {
-  preludeContents = '';
 }
 
 // Select hostType and hostPath. hostType defaults to 'node'.
@@ -101,7 +102,7 @@ if (argv.babelPresets) {
     // working directory, but we can give it absolute paths to start with
     // and that ensure that it looks in the right place (relative to where
     // test262-harness is installed)
-    return Path.resolve(__dirname, '../node_modules/', bp);
+    return path.resolve(__dirname, '../node_modules/', bp);
   });
 
   transpiler = code => babel.transform(code, { presets }).code;
@@ -134,7 +135,7 @@ if (!test262Dir) {
 let test262Version;
 try {
   test262Version = JSON.parse(
-    fs.readFileSync(Path.join(test262Dir, 'package.json'))
+    fs.readFileSync(path.join(test262Dir, 'package.json'))
   ).version;
 } catch (err) {
   console.error('Unable to detect version of test262: ' + err);
@@ -150,7 +151,7 @@ if (acceptVersion ? acceptVersion !== test262Version :
   return;
 }
 
-const files = paths.map(pathToTestFile);
+const files = paths.map(pathToTestRecord);
 const tests = files.map(compileFile).filter(hasFeatures);
 const scenarios = tests.flatMap(scenariosForTest);
 const pairs = Rx.Observable.zip(pool, scenarios);
@@ -163,12 +164,12 @@ const resultEmitter = resultsEmitter(results);
 reporter(resultEmitter, reporterOpts);
 
 function printVersion() {
-  const p = require(Path.resolve(__dirname, "..", "package.json"));
+  const p = require(path.resolve(__dirname, '..', 'package.json'));
   console.log(`v${p.version}`);
 }
 
-function pathToTestFile(path) {
-  return { file: path, contents: fs.readFileSync(path, 'utf-8')};
+function pathToTestRecord(file) {
+  return { file, contents: fs.readFileSync(file, 'utf8') };
 }
 
 function hasFeatures(test) {
@@ -188,5 +189,6 @@ function compileFile(test) {
   } else {
     test.contents = preludeContents + test.contents;
   }
-  return compile(test, { test262Dir, includesDir });
+
+  return compiler(test, { test262Dir, includesDir });
 }
