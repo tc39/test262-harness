@@ -1,3 +1,10 @@
+// Copyright (C) 2017 Ecma International.  All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
+/*---
+description: |
+    Collection of assertion functions used throughout test262
+---*/
+
 function assert(mustBeTrue, message) {
   if (mustBeTrue === true) {
     return;
@@ -81,8 +88,8 @@ assert.throws = function (expectedErrorConstructor, func, message) {
 };
 
 assert.throws.early = function(err, code) {
-  let wrappedCode = `function wrapperFn() { ${code} }`;
-  let ieval = eval;
+  var wrappedCode = 'function wrapperFn() { ' + code + ' }';
+  var ieval = eval;
 
-  assert.throws(err, () => { Function(wrappedCode); }, `Function: ${code}`);
+  assert.throws(err, function() { Function(wrappedCode); }, 'Function: ' + code);
 };
