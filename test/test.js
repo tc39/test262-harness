@@ -185,5 +185,19 @@ tap.test('saving compiled tests', assert => {
       }).catch(error => console.log(error)).then(assert.done);
   });
 
+  tap.test('save failed compiled tests with `--saveOnlyFailed` (implies `--saveCompiledTests`)', assert => {
+
+    run([sourcepattern, '--saveOnlyFailed'])
+      .catch(assert.fail)
+      .then(() => {
+        const results = glob.sync(resultpattern);
+        assert.equal(results.length, 3, 'Expecting 3 result files.');
+
+        return Promise.all(
+          results.map(result => new Promise(resolve => fs.unlink(result, () => resolve())))
+        );
+      }).catch(error => console.log(error)).then(assert.done);
+  });
+
   assert.done();
 });

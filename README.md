@@ -26,10 +26,11 @@ Run `test262-harness --help` for details on the various configuration options.
 
 ## Options
 
-| Option Name | Action      |
-|------------|---------------|
+| Option Name | Action | Required |
+| -- | -- | -- |
+|`-h`, `--help` | Show help & examples
 | `--hostType` | Type of host to run tests in. See [eshost's supported hosts](https://github.com/bterlson/eshost#supported-hosts) for available options.
-| `--hostPath` | Path to the host executable.
+| `--hostPath` | Path to the host executable. | Yes, if `--hostType` is specified.
 | `--hostArgs` | Any additional arguments to pass to the host when invoking it (eg. `--harmony`, `--es6all`, etc). 
 | `-t`, `--threads` | Run this many tests in parallel. Note that the browser runners don't work great with t > 1.
 | `-r`, `--reporter` | Format of data written to standard output. Currently either `json` or `simple`. Default `simple`.
@@ -41,7 +42,6 @@ Run `test262-harness --help` for details on the various configuration options.
 |`--timeout` | Set a custom test timeout (in ms, default 10000)
 |`-v`, `--version` | Print the current version of test262-harness
 |`--babelPresets` | Babel presets used to transpile code. E.g.: `stage-2`, `stage-3`
-|`-h`, `--help` | Show help
 | `--acceptVersion` | Optional. Execute tests from a version of Test262 that differs from the versions supported by this utility. This may cause the utility to report invalid test results.
 | `--saveCompiledTests` | Write the compiled version of `path/to/test.js` as `path/to/test.<hostType>.js` so that it can be easily re-run under that host. Run `test262-harness --help` for examples.
-| `--saveOnlyFailed` | Only save the compiled version of the test if it failed, to help easily repro failed tests (requires `--saveCompiledTests`).
+| `--saveOnlyFailed` | Only save the compiled version of the test if it failed, to help easily repro failed tests (implies `--saveCompiledTests`).

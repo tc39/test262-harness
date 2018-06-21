@@ -56,6 +56,11 @@ if (argv.reporterKeys) {
   reporterOpts.reporterKeys = argv.reporterKeys.split(',');
 }
 
+// Using argv.saveOnlyFailed implies argv.saveCompiledTests
+if (argv.saveOnlyFailed && !argv.saveCompiledTests) {
+  argv.saveCompiledTests = true;
+}
+
 if (argv.saveCompiledTests) {
   reporterOpts.saveCompiledTests = argv.saveCompiledTests;
   if (argv.saveOnlyFailed) {
