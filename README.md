@@ -26,7 +26,7 @@ Run `test262-harness --help` for details on the various configuration options.
 
 ## Options
 
-| Name    | Action      |
+| Option Name | Action      |
 |------------|---------------|
 | `--hostType` | Type of host to run tests in. See [eshost's supported hosts](https://github.com/bterlson/eshost#supported-hosts) for available options.
 | `--hostPath` | Path to the host executable.
@@ -43,3 +43,5 @@ Run `test262-harness --help` for details on the various configuration options.
 |`--babelPresets` | Babel presets used to transpile code. E.g.: `stage-2`, `stage-3`
 |`-h`, `--help` | Show help
 | `--acceptVersion` | Optional. Execute tests from a version of Test262 that differs from the versions supported by this utility. This may cause the utility to report invalid test results.
+| `--saveCompiledTests` | Write the compiled version of `path/to/test.js` as `path/to/test.<hostType>.js` so that it can be easily re-run under that host. Run `test262-harness --help` for examples.
+| `--saveOnlyFailed` | Only save the compiled version of the test if it failed, to help easily repro failed tests (requires `--saveCompiledTests`).
