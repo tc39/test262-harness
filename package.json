@@ -22,7 +22,7 @@
     "yargs": "^4.7.1"
   },
   "author": "Brian Terlson",
-  "license": "BSD",
+  "license": "BSD-3-Clause",
   "files": [
     "index.js",
     "bin",
