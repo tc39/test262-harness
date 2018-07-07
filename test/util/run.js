@@ -8,6 +8,7 @@ module.exports = function run(extraArgs) {
         '--hostType', 'node',
         '--hostPath', process.execPath,
         '-r', 'json',
+        '--timeout', '2000',
         '--includesDir', './test/test-includes',
       ].concat(extraArgs);
 
