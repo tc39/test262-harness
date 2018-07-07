@@ -1,3 +1,4 @@
+'use strict';
 const cp = require('child_process');
 
 module.exports = function run(extraArgs) {

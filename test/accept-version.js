@@ -1,3 +1,4 @@
+'use strict';
 const tap = require('tap');
 
 const run = require('./util/run');
