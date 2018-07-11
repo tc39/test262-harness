@@ -46,6 +46,32 @@ tap.test('stderr reported', assert => {
   assert.end();
 });
 
+tap.test('failure, stderr has the contents', assert => {
+  const rawResult = {
+    stderr: 'Segmentation Fault\n',
+    stdout: '',
+    error: null
+  };
+
+  const validated = validator(Object.assign({}, fixture, { rawResult }));
+  assert.equal(validated.pass, false);
+  assert.equal(validated.message, 'Segmentation Fault\n');
+  assert.end();
+});
+
+tap.test('failure, stdout has the contents', assert => {
+  const rawResult = {
+    stderr: '',
+    stdout: 'Segmentation Fault\n',
+    error: null
+  };
+
+  const validated = validator(Object.assign({}, fixture, { rawResult }));
+  assert.equal(validated.pass, false);
+  assert.equal(validated.message, 'Segmentation Fault\n');
+  assert.end();
+});
+
 tap.test('Test262Error reported', assert => {
   const rawResult = {
     stderr: '',
