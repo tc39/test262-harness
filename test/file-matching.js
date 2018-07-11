@@ -1,17 +1,17 @@
 'use strict';
 
 const cp = require('child_process');
-const tap = require('tap');
 const path = require('path');
+const tap = require('tap');
 
-const sameMembers = (test, actual, expected) => {
+const sameMembers = (assert, actual, expected) => {
   const expectedSet = new Set(expected.map((expectedMember) => {
     return expectedMember.split('/').join(path.sep);
   }));
-  test.equal(actual.length, expected.length);
+  assert.equal(actual.length, expected.length);
 
   for (let actualMember of actual) {
-    test.assert(expectedSet.has(actualMember), actualMember);
+    assert.assert(expectedSet.has(actualMember), actualMember);
   }
 };
 
@@ -44,18 +44,18 @@ function run(extraArgs) {
   });
 }
 
-tap.test('file matching: file name', (test) => {
+tap.test('file matching: file name', assert => {
   run(['test/collateral-nested/test/evens/2.js'])
     .then((results) => {
       const actual = results.map((result) => result.file);
       const expected = [
         'test/collateral-nested/test/evens/2.js'
       ];
-      sameMembers(test, actual, expected);
-    }).then(test.done, test.fail);
+      sameMembers(assert, actual, expected);
+    }).then(assert.done, assert.fail);
 });
 
-tap.test('file matching: file names', (test) => {
+tap.test('file matching: file names', assert => {
   run([
       'test/collateral-nested/test/evens/2.js',
       'test/collateral-nested/test/mixed/2.js'
@@ -66,11 +66,11 @@ tap.test('file matching: file names', (test) => {
         'test/collateral-nested/test/evens/2.js',
         'test/collateral-nested/test/mixed/2.js'
       ];
-      sameMembers(test, actual, expected);
-    }).then(test.done, test.fail);
+      sameMembers(assert, actual, expected);
+    }).then(assert.done, assert.fail);
 });
 
-tap.test('file matching: file names (outside of Test262 directory)', (test) => {
+tap.test('file matching: file names (outside of Test262 directory)', assert => {
   run([
       'test/collateral-nested/test/evens/2.js',
       'test/collateral/test/strict.js'
@@ -81,11 +81,11 @@ tap.test('file matching: file names (outside of Test262 directory)', (test) => {
         'test/collateral-nested/test/evens/2.js',
         'test/collateral/test/strict.js'
       ];
-      sameMembers(test, actual, expected);
-    }).then(test.done, test.fail);
+      sameMembers(assert, actual, expected);
+    }).then(assert.done, assert.fail);
 });
 
-tap.test('file matching: glob: any directory (shallow)', (test) => {
+tap.test('file matching: glob: any directory (shallow)', assert => {
   run(['test/collateral-nested/test/*/2.js'])
     .then((results) => {
       const actual = results.map((result) => result.file);
@@ -93,11 +93,11 @@ tap.test('file matching: glob: any directory (shallow)', (test) => {
         'test/collateral-nested/test/evens/2.js',
         'test/collateral-nested/test/mixed/2.js'
       ];
-      sameMembers(test, actual, expected);
-    }).then(test.done, test.fail);
+      sameMembers(assert, actual, expected);
+    }).then(assert.done, assert.fail);
 });
 
-tap.test('file matching: glob: any directory (deep)', (test) => {
+tap.test('file matching: glob: any directory (deep)', assert => {
   run(['test/collateral-nested/test/**/2.js'])
     .then((results) => {
       const actual = results.map((result) => result.file);
@@ -106,12 +106,12 @@ tap.test('file matching: glob: any directory (deep)', (test) => {
         'test/collateral-nested/test/mixed/2.js',
         'test/collateral-nested/test/mixed/deep/2.js'
       ];
-      sameMembers(test, actual, expected);
-    }).then(test.done, test.fail);
+      sameMembers(assert, actual, expected);
+    }).then(assert.done, assert.fail);
 });
 
 
-tap.test('file matching: glob: partial filename', (test) => {
+tap.test('file matching: glob: partial filename', assert => {
   run(['test/collateral-nested/test/**/2*.js'])
     .then((results) => {
       const actual = results.map((result) => result.file);
@@ -124,11 +124,11 @@ tap.test('file matching: glob: partial filename', (test) => {
         'test/collateral-nested/test/mixed/deep/2.js',
         'test/collateral-nested/test/odds/23.js'
       ];
-      sameMembers(test, actual, expected);
-    }).then(test.done, test.fail);
+      sameMembers(assert, actual, expected);
+    }).then(assert.done, assert.fail);
 });
 
-tap.test('file matching: glob: partial directory name', (test) => {
+tap.test('file matching: glob: partial directory name', assert => {
   run(['test/collateral-nested/test/*s/*.js'])
     .then((results) => {
       const actual = results.map((result) => result.file);
@@ -138,6 +138,6 @@ tap.test('file matching: glob: partial directory name', (test) => {
         'test/collateral-nested/test/odds/23.js',
         'test/collateral-nested/test/odds/3.js',
       ];
-      sameMembers(test, actual, expected);
-    }).then(test.done, test.fail);
+      sameMembers(assert, actual, expected);
+    }).then(assert.done, assert.fail);
 });

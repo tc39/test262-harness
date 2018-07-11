@@ -1,9 +1,8 @@
 'use strict';
 
-const tap = require('tap');
-
 const parseFile = require('test262-parser').parseFile;
 const run = require('./util/run');
+const tap = require('tap');
 
 const tests = [
   [['test/**/*.js'], { cwd: 'test/collateral-with-harness/test262' }],
@@ -38,40 +37,40 @@ function validate({ records, options = { prelude: false } }) {
       `${record.attrs.description} with prelude` :
       record.attrs.description;
 
-    tap.test(description, test => {
+    tap.test(description, assert => {
 
       if (typeof record.scenario !== 'undefined') {
         if (record.contents.startsWith('"use strict"')) {
-          test.equal(record.scenario, 'strict mode');
+          assert.equal(record.scenario, 'strict mode');
         } else {
-          test.equal(record.scenario, 'default');
+          assert.equal(record.scenario, 'default');
         }
       }
 
-      test.assert(record.attrs.expected, 'Test has an "expected" frontmatter');
+      assert.notEqual(record.attrs.expected, undefined, 'Test has an "expected" frontmatter');
       if (!record.attrs.expected) {
         // can't do anything else
-        test.end();
+        assert.end();
         return;
       }
 
-      test.equal(record.result.pass, record.attrs.expected.pass, 'Test passes or fails as expected');
+      assert.equal(record.result.pass, record.attrs.expected.pass, 'Test passes or fails as expected');
 
       if (record.attrs.expected.message) {
-        test.equal(record.result.message, record.attrs.expected.message, 'Test fails with appropriate message');
+        assert.equal(record.result.message, record.attrs.expected.message, 'Test fails with appropriate message');
       }
 
       if (options.prelude) {
-        test.assert(record.rawResult.stdout.indexOf('prelude!') > -1, 'Has prelude content');
+        assert.ok(record.rawResult.stdout.includes('prelude!'), 'Has prelude content');
       }
 
       if (options.noRawResult) {
-        test.equal(record.rawResult, undefined);
+        assert.equal(record.rawResult, undefined);
       } else {
-        test.equal(typeof record.rawResult, 'object');
+        assert.equal(typeof record.rawResult, 'object');
       }
 
-      test.end();
+      assert.end();
     });
   });
 }

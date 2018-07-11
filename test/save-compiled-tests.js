@@ -1,12 +1,10 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
-
-const tap = require('tap');
 const glob = require('glob');
-
+const path = require('path');
 const run = require('./util/run');
+const tap = require('tap');
 
 const sourcepattern = path.join(process.cwd(), 'test/collateral-save/test/*.js');
 const resultpattern = path.join(process.cwd(), 'test/collateral-save/test/*.{fail,pass}');
