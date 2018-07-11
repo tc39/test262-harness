@@ -43,5 +43,5 @@ Run `test262-harness --help` for details on the various configuration options.
 | `--timeout` | Set a custom test timeout in milliseconds | No | `10000` |
 | `--babelPresets` | Babel presets used to transpile code. E.g.: `stage-2`, `stage-3`. **Deprecated** | No | n/a |
 | `--acceptVersion` | Execute tests from a version of Test262 that differs from the versions supported by this utility. This may cause the utility to report invalid test results. | No | Inferred from `test262Dir/package.json` |
-| `--saveCompiledTests` | Write the compiled version of `path/to/test.js` as `path/to/test.js.<hostType>.<pass\|fail>` so that it can be easily re-run under that host. Run `test262-harness --help` for examples. | No | n/a 
+| `--saveCompiledTests` | Write the compiled version of `path/to/test.js` as `path/to/test.js.<hostType>.<default|strict>.<pass\|fail>` so that it can be easily re-run under that host. Run `test262-harness --help` for examples. | No | n/a 
 | `--saveOnlyFailed` | Only save the compiled version of the test if it failed, to help easily repro failed tests (implies `--saveCompiledTests`). | No | n/a 
