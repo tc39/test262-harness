@@ -15,7 +15,17 @@ tap.test('save all compiled tests with `--saveCompiledTests`', assert => {
     .catch(assert.fail)
     .then(() => {
       const results = glob.sync(resultpattern);
-      assert.equal(results.length, sources.length, 'Expecting an equal number of result files to source files.');
+      // sources.length * 2 scenarios = results.length
+      let expected = sources.length * 2;
+      // However, there are special cases:
+      expected -= 1; // for noStrict.js
+      expected -= 1; // for rawNoStrict.js
+      expected -= 1; // for rawStrict.js
+      expected -= 1; // for strict.js
+
+      assert.equal(
+        results.length, expected, 'Saves the exact number of expected files'
+      );
 
       return Promise.all(
         results.map(result => new Promise(resolve => fs.unlink(result, () => resolve())))
@@ -29,7 +39,8 @@ tap.test('save failed compiled tests with `--saveCompiledTests --saveOnlyFailed`
     .catch(assert.fail)
     .then(() => {
       const results = glob.sync(resultpattern);
-      assert.equal(results.length, 3, 'Expecting 3 result files.');
+      // 3 test files * 2 scenarios = 6 saved files
+      assert.equal(results.length, 6, 'Expecting 6 result files.');
 
       return Promise.all(
         results.map(result => new Promise(resolve => fs.unlink(result, () => resolve())))
@@ -43,7 +54,8 @@ tap.test('save failed compiled tests with `--saveOnlyFailed` (implies `--saveCom
     .catch(assert.fail)
     .then(() => {
       const results = glob.sync(resultpattern);
-      assert.equal(results.length, 3, 'Expecting 3 result files.');
+      // 3 test files * 2 scenarios = 6 saved files
+      assert.equal(results.length, 6, 'Expecting 6 result files.');
 
       return Promise.all(
         results.map(result => new Promise(resolve => fs.unlink(result, () => resolve())))

@@ -1,2 +1,2 @@
 node_modules/
-test/**/*.js.node.{fail,pass}
+test/**/*.js.node.{default|strict}.{fail,pass}
