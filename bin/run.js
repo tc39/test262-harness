@@ -24,6 +24,8 @@ const argv = cli.argv;
 let test262Dir = argv.test262Dir;
 // where to load includes from (usually a subdirectory of test262dir)
 let includesDir = argv.includesDir;
+
+let tempDir = argv.tempDir;
 let acceptVersion = argv.acceptVersion;
 
 // print version of test262-harness
@@ -135,7 +137,7 @@ if (!argv._.length) {
 
 // Test Pipeline
 const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath,
-                       { timeout: argv.timeout, transpiler });
+                       { tempDir, timeout: argv.timeout, transpiler });
 
 if (!test262Dir) {
   test262Dir = test262Finder(argv._[0]);
