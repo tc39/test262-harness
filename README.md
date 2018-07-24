@@ -26,7 +26,7 @@ Run `test262-harness --help` for details on the various configuration options.
 
 ## Options
 
-| Option Name | Action | Required | Default |
+| Option Name | Description | Required | Default |
 | -- | -- | -- | -- |
 | `-h`, `--help` | Show help & examples | n/a | n/a |
 | `-v`, `--version` | Print the current version of test262-harness | n/a | n/a |
@@ -39,6 +39,7 @@ Run `test262-harness --help` for details on the various configuration options.
 | `--reporter-keys` | Comma-separated list of keys to include in output of `json` reporter. | No | n/a |
 | `--test262Dir` | Root test262 directory and is used to locate the includes directory. | No | Relative to test files |
 | `--includesDir` | Includes directory. | No | Inferred from `test262Dir` or else detected by walking upward from the first test found. |
+| `--tempDir` | Directory that `eshost` will create its temp files in (does not affect location of files created by `--saveCompiledTests` and `--saveOnlyFailed` | No | OS Temp Dir |
 | `--prelude` | Path to a file to include before every test (useful for testing polyfills for example) | No | n/a |
 | `--timeout` | Set a custom test timeout in milliseconds | No | `10000` |
 | `--babelPresets` | Babel presets used to transpile code. E.g.: `stage-2`, `stage-3`. **Deprecated** | No | n/a |
