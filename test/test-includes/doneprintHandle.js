@@ -12,9 +12,9 @@ function __consolePrintHandle__(msg) {
 function $DONE(error) {
   if (error) {
     if(typeof error === 'object' && error !== null && 'name' in error) {
-      __consolePrintHandle__('Test262:AsyncTestFailure ' + error.name + ': ' + error.message);
+      __consolePrintHandle__('Test262:AsyncTestFailure:' + error.name + ': ' + error.message);
     } else {
-      __consolePrintHandle__('Test262:AsyncTestFailure Test262Error: ' + error);
+      __consolePrintHandle__('Test262:AsyncTestFailure:Test262Error: ' + error);
     }
   } else {
     __consolePrintHandle__('Test262:AsyncTestComplete');
