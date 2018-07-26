@@ -81,6 +81,69 @@ tap.test('file matching: file names', assert => {
     }).then(assert.done, assert.fail);
 });
 
+tap.test('file matching: file names (siblings)', assert => {
+  run([
+      'test/collateral-nested/test/evens/2.js',
+      'test/collateral-nested/test/evens/42.js'
+    ])
+    .then((results) => {
+      const files = results.map((result) => result.file);
+      const relativePaths = results.map((result) => result.relative);
+      const expectedFiles = [
+        'test/collateral-nested/test/evens/2.js',
+        'test/collateral-nested/test/evens/42.js'
+      ];
+      sameMembers(assert, files, expectedFiles);
+      const expectedRelPaths = [
+        'evens/2.js',
+        'evens/42.js'
+      ];
+      sameMembers(assert, relativePaths, expectedRelPaths);
+    }).then(assert.done, assert.fail);
+});
+
+tap.test('file matching: file names (subdirectory first)', assert => {
+  run([
+      'test/collateral-nested/test/evens/deep/26.js',
+      'test/collateral-nested/test/evens/2.js'
+    ])
+    .then((results) => {
+      const files = results.map((result) => result.file);
+      const relativePaths = results.map((result) => result.relative);
+      const expectedFiles = [
+        'test/collateral-nested/test/evens/deep/26.js',
+        'test/collateral-nested/test/evens/2.js'
+      ];
+      sameMembers(assert, files, expectedFiles);
+      const expectedRelPaths = [
+        'evens/deep/26.js',
+        'evens/2.js'
+      ];
+      sameMembers(assert, relativePaths, expectedRelPaths);
+    }).then(assert.done, assert.fail);
+});
+
+tap.test('file matching: file names (subdirectory second)', assert => {
+  run([
+      'test/collateral-nested/test/evens/2.js',
+      'test/collateral-nested/test/evens/deep/26.js'
+    ])
+    .then((results) => {
+      const files = results.map((result) => result.file);
+      const relativePaths = results.map((result) => result.relative);
+      const expectedFiles = [
+        'test/collateral-nested/test/evens/2.js',
+        'test/collateral-nested/test/evens/deep/26.js'
+      ];
+      sameMembers(assert, files, expectedFiles);
+      const expectedRelPaths = [
+        'evens/2.js',
+        'evens/deep/26.js'
+      ];
+      sameMembers(assert, relativePaths, expectedRelPaths);
+    }).then(assert.done, assert.fail);
+});
+
 tap.test('file matching: file names (outside of Test262 directory)', assert => {
   run([
       'test/collateral-nested/test/evens/2.js',
