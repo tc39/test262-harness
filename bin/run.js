@@ -71,7 +71,11 @@ if (argv.saveCompiledTests) {
 // load preload contents
 let preludeContents = '';
 if (argv.prelude) {
-  preludeContents = fs.readFileSync(argv.prelude, 'utf8');
+  if (Array.isArray(argv.prelude)) {
+    preludeContents = argv.prelude.map(prelude => fs.readFileSync(prelude, 'utf8')).join("\n");
+  } else {
+    preludeContents = fs.readFileSync(argv.prelude, 'utf8');
+  }
 }
 
 // Select hostType and hostPath. hostType defaults to 'node'.
