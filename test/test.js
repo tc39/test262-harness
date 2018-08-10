@@ -13,7 +13,7 @@ const tests = [
   [['test/collateral-with-harness/test262/test/**/*.js']],
   [['--includesDir', './test-includes', 'collateral/test/**/*.js'], { cwd: 'test' }],
   [['collateral-with-harness/test262/test/**/*.js'], { cwd: 'test' }],
-  [['--includesDir', './test/test-includes', '--prelude', './test/fixtures/prelude.js', 'test/collateral/test/bothStrict.js'], { prelude: true }],
+  [['--includesDir', './test/test-includes', '--prelude', './test/fixtures/prelude-a.js',  '--prelude', './test/fixtures/prelude-b.js', 'test/collateral/test/bothStrict.js'], { prelude: true }],
   [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result', 'test/collateral/test/bothStrict.js'], { noRawResult: true }],
   [['--includesDir', './test/test-includes', '--reporter-keys', 'rawResult,attrs,result', 'test/collateral/test/bothStrict.js']],
   [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,rawResult,result', 'test/collateral/test/bothStrict.js']],
@@ -61,7 +61,8 @@ function validate({ records, options = { prelude: false } }) {
       }
 
       if (options.prelude) {
-        assert.ok(record.rawResult.stdout.includes('prelude!'), 'Has prelude content');
+        assert.ok(record.rawResult.stdout.includes('prelude a!'), 'Has prelude-a content');
+        assert.ok(record.rawResult.stdout.includes('prelude b!'), 'Has prelude-b content');
       }
 
       if (options.noRawResult) {

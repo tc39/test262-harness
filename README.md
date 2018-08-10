@@ -40,7 +40,7 @@ Run `test262-harness --help` for details on the various configuration options.
 | `--test262Dir` | Root test262 directory and is used to locate the includes directory. | No | Relative to test files |
 | `--includesDir` | Includes directory. | No | Inferred from `test262Dir` or else detected by walking upward from the first test found. |
 | `--tempDir` | Directory that `eshost` will create its temp files in (does not affect location of files created by `--saveCompiledTests` and `--saveOnlyFailed` | No | OS Temp Dir |
-| `--prelude` | Path to a file to include before every test (useful for testing polyfills for example) | No | n/a |
+| `--prelude` | Path to a file to include before every test (useful for testing polyfills for example); supports multiple `--prelude` parameters | No | n/a |
 | `--timeout` | Set a custom test timeout in milliseconds | No | `10000` |
 | `--babelPresets` | Babel presets used to transpile code. E.g.: `stage-2`, `stage-3`. **Deprecated** | No | n/a |
 | `--acceptVersion` | Execute tests from a version of Test262 that differs from the versions supported by this utility. This may cause the utility to report invalid test results. | No | Inferred from `test262Dir/package.json` |
