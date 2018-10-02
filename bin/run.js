@@ -127,6 +127,10 @@ if (argv.babelPresets) {
   transpiler = code => babel.transform(code, { presets }).code;
 }
 
+if (argv.transformer) {
+  transpiler = require(argv.transformer);
+}
+
 if (argv.features) {
   features = argv.features.split(',').map(feature => feature.trim());
 }
