@@ -108,27 +108,10 @@ if (hostType) {
 }
 
 argv.timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
-let transpiler;
-if (argv.babelPresets) {
-  let babel = require('babel-core');
+let transform;
 
-  // https://github.com/bterlson/test262-harness/issues/87
-  let presets = argv.babelPresets.split(",").map(bp => {
-    if (!bp.startsWith('babel-preset-')) {
-      bp = `babel-preset-${bp}`;
-    }
-    // babel's option manager will look for presets relative to the current
-    // working directory, but we can give it absolute paths to start with
-    // and that ensure that it looks in the right place (relative to where
-    // test262-harness is installed)
-    return path.resolve(__dirname, '../node_modules/', bp);
-  });
-
-  transpiler = code => babel.transform(code, { presets }).code;
-}
-
-if (argv.transformer) {
-  transpiler = require(argv.transformer);
+if (argv.transformer || argv.transform) {
+  transform = require(argv.transformer || argv.transform);
 }
 
 if (argv.features) {
@@ -144,12 +127,13 @@ if (!argv._.length) {
 
 // Test Pipeline
 const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath,
-                       { tempDir, timeout: argv.timeout, transpiler });
+                       { tempDir, timeout: argv.timeout, transform });
 
 if (!test262Dir) {
   test262Dir = test262Finder(argv._[0]);
 }
 reporterOpts.test262Dir = test262Dir;
+
 const remove = path.relative(process.cwd(), test262Dir);
 argv._ = argv._.map(p => path.relative(remove, p));
 

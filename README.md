@@ -2,11 +2,7 @@
 
 [![Travis Build Status](https://travis-ci.org/bterlson/test262-harness.svg?branch=master)](https://travis-ci.org/bterlson/test262-harness)
 
-An experimental Node-based test262 harness. Once this harness has stabilized, I plan to push to include it by default in official test262.
-
-Requires Node 6 or above.
-
-## Quick Start
+## Test Authoring Quick Start
 
 1. Clone **test262** locally:
     ```
@@ -42,7 +38,7 @@ Run `test262-harness --help` for details on the various configuration options.
 | `--tempDir` | Directory that `eshost` will create its temp files in (does not affect location of files created by `--saveCompiledTests` and `--saveOnlyFailed` | No | OS Temp Dir |
 | `--prelude` | Path to a file to include before every test (useful for testing polyfills for example); supports multiple `--prelude` parameters | No | n/a |
 | `--timeout` | Set a custom test timeout in milliseconds | No | `10000` |
-| `--babelPresets` | Babel presets used to transpile code. E.g.: `stage-2`, `stage-3`. **Deprecated** | No | n/a |
+| `--transformer` | Path to module which exports a code transformer function | No | n/a |
 | `--acceptVersion` | Execute tests from a version of Test262 that differs from the versions supported by this utility. This may cause the utility to report invalid test results. | No | Inferred from `test262Dir/package.json` |
 | `--saveCompiledTests` | Write the compiled version of `path/to/test.js` as `path/to/test.js.<hostType>.<default\|strict>.<pass\|fail>` so that it can be easily re-run under that host. Run `test262-harness --help` for examples. | No | n/a 
 | `--saveOnlyFailed` | Only save the compiled version of the test if it failed, to help easily repro failed tests (implies `--saveCompiledTests`). | No | n/a 

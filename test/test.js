@@ -3,6 +3,7 @@
 const parseFile = require('test262-parser').parseFile;
 const run = require('./util/run');
 const tap = require('tap');
+const path = require('path');
 
 const tests = [
   [['test/**/*.js'], { cwd: 'test/collateral-with-harness/test262' }],
@@ -18,7 +19,7 @@ const tests = [
   [['--includesDir', './test/test-includes', '--reporter-keys', 'rawResult,attrs,result', 'test/collateral/test/bothStrict.js']],
   [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,rawResult,result', 'test/collateral/test/bothStrict.js']],
   [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result,rawResult', 'test/collateral/test/bothStrict.js']],
-   [['--includesDir', './test/test-includes', '--babelPresets', 'stage-3', '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/test/spread-sngl-obj-ident.js']],
+   [['--includesDir', './test/test-includes', '--transformer', path.join(__dirname, './transformer/spec.js'), '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/test/spread-sngl-obj-ident.js']],
 ];
 
 Promise.all(tests.map(args => run(...args).then(validate)))
