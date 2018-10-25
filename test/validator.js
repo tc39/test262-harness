@@ -147,6 +147,26 @@ tap.test('attrs.flags.async: true (fail)', assert => {
   assert.end();
 });
 
+tap.test('attrs.flags.async: true (fail, but no output)', assert => {
+  const rawResult = {
+    stderr: '',
+    stdout: '',
+    error: null,
+  };
+
+  const attrs = Object.assign({}, fixture.attrs, {
+    flags: {
+      async: true,
+    }
+  });
+
+  const test = Object.assign({}, fixture, { attrs, rawResult });
+  const validated = validator(test);
+  assert.equal(validated.pass, false);
+  assert.equal(validated.message, 'Test did not run to completion');
+  assert.end();
+});
+
 tap.test('attrs.negative (pass)', assert => {
   const rawResult = {
     stderr: '',
