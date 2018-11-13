@@ -20,7 +20,23 @@ const tests = [
   [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,rawResult,result', 'test/collateral/test/bothStrict.js']],
   [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result,rawResult', 'test/collateral/test/bothStrict.js']],
    [['--includesDir', './test/test-includes', '--transformer', path.join(__dirname, './transformer/spec.js'), '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/test/spread-sngl-obj-ident.js']],
-];
+].reduce((accum, a) => {
+  let b = a.slice();
+
+  if (a.length === 1) {
+    a.push({ reporter: 'json' });
+    b.push({ reporter: 'simple' });
+  } else {
+    Object.assign(a[1], { reporter: 'json' });
+    Object.assign(b[1], { reporter: 'simple' });
+  }
+
+  accum.push(a, b);
+
+  return accum;
+}, []);
+
+
 
 Promise.all(tests.map(args => run(...args).then(validate)))
   .catch(reportRunError);
@@ -31,48 +47,65 @@ function reportRunError(error) {
   process.exit(1);
 }
 
-function validate({ records, options = { prelude: false } }) {
-  records.forEach(record => {
+function validate({ args, records, options = { prelude: false } }) {
+  if (options.reporter === 'json') {
+    records.forEach(record => {
+      const description = options.prelude ?
+        `${record.attrs.description} with prelude` :
+        record.attrs.description;
 
-    const description = options.prelude ?
-      `${record.attrs.description} with prelude` :
-      record.attrs.description;
+      tap.test(description, assert => {
 
-    tap.test(description, assert => {
-
-      if (typeof record.scenario !== 'undefined') {
-        if (record.contents.startsWith('"use strict"')) {
-          assert.equal(record.scenario, 'strict mode');
-        } else {
-          assert.equal(record.scenario, 'default');
+        if (typeof record.scenario !== 'undefined') {
+          if (record.contents.startsWith('"use strict"')) {
+            assert.equal(record.scenario, 'strict mode');
+          } else {
+            assert.equal(record.scenario, 'default');
+          }
         }
-      }
 
-      assert.notEqual(record.attrs.expected, undefined, 'Test has an "expected" frontmatter');
-      if (!record.attrs.expected) {
-        // can't do anything else
+        assert.notEqual(record.attrs.expected, undefined, 'Test has an "expected" frontmatter');
+        if (!record.attrs.expected) {
+          // can't do anything else
+          assert.end();
+          return;
+        }
+
+        assert.equal(record.result.pass, record.attrs.expected.pass, 'Test passes or fails as expected');
+
+        if (record.attrs.expected.message) {
+          assert.equal(record.result.message, record.attrs.expected.message, 'Test fails with appropriate message');
+        }
+
+        if (options.prelude) {
+          assert.ok(record.rawResult.stdout.includes('prelude a!'), 'Has prelude-a content');
+          assert.ok(record.rawResult.stdout.includes('prelude b!'), 'Has prelude-b content');
+        }
+
+        if (options.noRawResult) {
+          assert.equal(record.rawResult, undefined);
+        } else {
+          assert.equal(typeof record.rawResult, 'object');
+        }
+
         assert.end();
-        return;
-      }
+      });
+    });
+  }
 
-      assert.equal(record.result.pass, record.attrs.expected.pass, 'Test passes or fails as expected');
+  if (options.reporter === 'simple') {
+    tap.test(args.join(' '), assert => {
+      const stdouts = records.slice(0, -3);
+      const captured = records.slice(-3);
 
-      if (record.attrs.expected.message) {
-        assert.equal(record.result.message, record.attrs.expected.message, 'Test fails with appropriate message');
-      }
+      const pass = stdouts.filter(out => out.startsWith('PASS')).length;
+      const fail = stdouts.filter(out => out.startsWith('FAIL')).length;
+      const [report, passed, failed] = captured;
 
-      if (options.prelude) {
-        assert.ok(record.rawResult.stdout.includes('prelude a!'), 'Has prelude-a content');
-        assert.ok(record.rawResult.stdout.includes('prelude b!'), 'Has prelude-b content');
-      }
-
-      if (options.noRawResult) {
-        assert.equal(record.rawResult, undefined);
-      } else {
-        assert.equal(typeof record.rawResult, 'object');
-      }
-
+      assert.equal(report, `Ran ${pass + fail} tests`);
+      assert.equal(passed, `${pass} passed`);
+      assert.equal(failed, `${fail} failed`);
       assert.end();
     });
-  });
+  }
 }

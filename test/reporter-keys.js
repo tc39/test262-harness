@@ -3,13 +3,14 @@
 const tap = require('tap');
 const _run = require('./util/run');
 
+const reporter = 'json';
 function run(...args) {
   return _run([
     ...args,
     '--includesDir',
     './test/test-includes',
     './test/collateral-nested/test/**/*.js'
-  ]).then(({records}) => records);
+  ], {reporter}).then(({records}) => records);
 }
 
 tap.test('all keys', assert => {

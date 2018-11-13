@@ -9,13 +9,14 @@ const fs = require('fs');
 const path = require('path');
 const util = require('util');
 
-const Rx = require('rx');
+const { zip } = require('rxjs');
+const { flatMap, filter, map } = require('rxjs/operators');
 
-const agentPool = require('../lib/agentPool.js');
+const AgentPool = require('../lib/agent-pool.js');
+const TestStream = require('../lib/test-stream');
+const ResultsEmitter = require('../lib/results-emitter.js');
 const cli = require('../lib/cli.js');
 const test262Finder = require('../lib/findTest262.js');
-const testStream = require('../lib/test-stream');
-const resultsEmitter = require('../lib/resultsEmitter.js');
 const validator = require('../lib/validator.js');
 
 const argv = cli.argv;
@@ -47,12 +48,6 @@ if (fs.existsSync(path.join(__dirname, '../lib/reporters', `${argv.reporter}.js`
 }
 
 if (argv.reporterKeys) {
-  if (argv.reporter !== 'json') {
-    console.error('`--reporter-keys` option applies only to the `json` reporter.');
-    process.exitCode = 1;
-    return;
-  }
-
   reporterOpts.reporterKeys = argv.reporterKeys.split(',');
 }
 
@@ -107,7 +102,7 @@ if (hostType) {
   reporterOpts.hostType = hostType;
 }
 
-argv.timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
+let timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
 let transform;
 
 if (argv.transformer || argv.transform) {
@@ -126,8 +121,9 @@ if (!argv._.length) {
 }
 
 // Test Pipeline
-const pool = agentPool(Number(argv.threads), hostType, argv.hostArgs, hostPath,
-                       { tempDir, timeout: argv.timeout, transform });
+const pool = new AgentPool(
+  Number(argv.threads), hostType, argv.hostArgs, hostPath, { tempDir, timeout, transform }
+);
 
 if (!test262Dir) {
   test262Dir = test262Finder(argv._[0]);
@@ -156,17 +152,23 @@ if (acceptVersion ? acceptVersion !== test262Version :
   return;
 }
 
-const tests = testStream(test262Dir, includesDir, acceptVersion, argv._)
-  .map(insertPrelude)
-  .filter(hasFeatures);
-const pairs = Rx.Observable.zip(pool, tests);
-const rawResults = pairs.flatMap(pool.runTest).tapOnCompleted(() => pool.destroy());
-const results = rawResults.map(test => {
-  test.result = validator(test);
-  return test;
-});
-const resultEmitter = resultsEmitter(results);
-reporter(resultEmitter, reporterOpts);
+const stream = new TestStream(test262Dir, includesDir, acceptVersion, argv._);
+
+const tests = stream.pipe(filter(hasFeatures)).pipe(map(insertPrelude));
+
+const results = zip(pool, tests).pipe(
+  flatMap(pair => {
+    return pool.runTest(pair);
+  })
+).pipe(
+  map(test => {
+    test.result = validator(test);
+    return test;
+  })
+);
+
+const emitter = new ResultsEmitter(results);
+reporter(emitter, reporterOpts);
 
 function printVersion() {
   const p = require(path.resolve(__dirname, '..', 'package.json'));

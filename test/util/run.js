@@ -8,27 +8,31 @@ module.exports = function run(extraArgs, options) {
     let stdout = '';
     let stderr = '';
     let args = [
-        '--hostType', 'node',
-        '--hostPath', process.execPath,
-        '-r', 'json',
-        '--timeout', '2000',
-      ].concat(extraArgs);
+      '--hostType', 'node',
+      '--hostPath', process.execPath,
+      '--timeout', '2000',
+      ...[ '-r', options.reporter ],
+    ].concat(extraArgs);
 
-    let cwd = options && options.cwd;
-
+    const cwd = options && options.cwd;
     const child = cp.fork(binPath, args, { cwd, silent: true });
 
-    child.stdout.on('data', (data) => { stdout += data });
-    child.stderr.on('data', (data) => { stderr += data });
+    child.stdout.on('data', data => { stdout += data });
+    child.stderr.on('data', data => { stderr += data });
     child.on('exit', () => {
       if (stderr) {
         return reject(new Error(`Got stderr: ${stderr.toString()}`));
       }
 
       try {
+        let records = options.reporter === 'json' ?
+          JSON.parse(stdout) :
+          stdout.trim().split('\n');
+
         resolve({
-          records: JSON.parse(stdout),
-          options
+          args,
+          options,
+          records,
         });
       } catch(e) {
         reject(e);

@@ -10,8 +10,10 @@ const sourcepattern = path.join(process.cwd(), 'test/collateral-save/test/*.js')
 const resultpattern = path.join(process.cwd(), 'test/collateral-save/test/*.{fail,pass}');
 const sources = glob.sync(sourcepattern);
 
+const reporter = 'json';
+
 tap.test('save all compiled tests with `--saveCompiledTests`', assert => {
-  run(['--includesDir', './test/test-includes', sourcepattern, '--saveCompiledTests'])
+  run(['--includesDir', './test/test-includes', sourcepattern, '--saveCompiledTests'], {reporter})
     .catch(assert.fail)
     .then(() => {
       const results = glob.sync(resultpattern);
@@ -35,7 +37,7 @@ tap.test('save all compiled tests with `--saveCompiledTests`', assert => {
 
 tap.test('save failed compiled tests with `--saveCompiledTests --saveOnlyFailed`', assert => {
 
-  run(['--includesDir', './test/test-includes', sourcepattern, '--saveCompiledTests', '--saveOnlyFailed'])
+  run(['--includesDir', './test/test-includes', sourcepattern, '--saveCompiledTests', '--saveOnlyFailed'], {reporter})
     .catch(assert.fail)
     .then(() => {
       const results = glob.sync(resultpattern);
@@ -50,7 +52,7 @@ tap.test('save failed compiled tests with `--saveCompiledTests --saveOnlyFailed`
 
 tap.test('save failed compiled tests with `--saveOnlyFailed` (implies `--saveCompiledTests`)', assert => {
 
-  run(['--includesDir', './test/test-includes', sourcepattern, '--saveOnlyFailed'])
+  run(['--includesDir', './test/test-includes', sourcepattern, '--saveOnlyFailed'], {reporter})
     .catch(assert.fail)
     .then(() => {
       const results = glob.sync(resultpattern);
