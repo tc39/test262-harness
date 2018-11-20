@@ -7,19 +7,19 @@ const path = require('path');
 
 const tests = [
   [['test/**/*.js'], { cwd: 'test/collateral-with-harness/test262' }],
-  [['--test262Dir', './test/collateral-with-harness/test262', 'test/collateral-with-harness/test262/test/**/*.js']],
-  [['--test262Dir', './test/collateral-with-harness/test262', 'test/collateral-with-harness/test262/test/**/*.js', 'test/collateral-with-harness/loose-tests/*']],
+  [['--test262Dir', './test/collateral-with-harness/test262', './test/collateral-with-harness/test262/test/**/*.js']],
+  [['--test262Dir', './test/collateral-with-harness/test262', './test/collateral-with-harness/test262/test/**/*.js', './test/collateral-with-harness/loose-tests/*']],
   [['--test262Dir', './collateral-with-harness/test262', 'collateral-with-harness/test262/test/**/*.js'], { cwd: 'test' }],
-  [['--includesDir', './test/test-includes', 'test/collateral/test/**/*.js']],
+  [['--includesDir', './test/test-includes', './test/collateral/test/**/*.js']],
   [['test/collateral-with-harness/test262/test/**/*.js']],
   [['--includesDir', './test-includes', 'collateral/test/**/*.js'], { cwd: 'test' }],
   [['collateral-with-harness/test262/test/**/*.js'], { cwd: 'test' }],
-  [['--includesDir', './test/test-includes', '--prelude', './test/fixtures/prelude-a.js',  '--prelude', './test/fixtures/prelude-b.js', 'test/collateral/test/bothStrict.js'], { prelude: true }],
-  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result', 'test/collateral/test/bothStrict.js'], { noRawResult: true }],
-  [['--includesDir', './test/test-includes', '--reporter-keys', 'rawResult,attrs,result', 'test/collateral/test/bothStrict.js']],
-  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,rawResult,result', 'test/collateral/test/bothStrict.js']],
-  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result,rawResult', 'test/collateral/test/bothStrict.js']],
-   [['--includesDir', './test/test-includes', '--transformer', path.join(__dirname, './transformer/spec.js'), '--reporter-keys', 'attrs,result,rawResult', 'test/babel-collateral/test/spread-sngl-obj-ident.js']],
+  [['--includesDir', './test/test-includes', '--prelude', './test/fixtures/prelude-a.js',  '--prelude', './test/fixtures/prelude-b.js', './test/collateral/test/bothStrict.js'], { prelude: true }],
+  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result', './test/collateral/test/bothStrict.js'], { noRawResult: true }],
+  [['--includesDir', './test/test-includes', '--reporter-keys', 'rawResult,attrs,result', './test/collateral/test/bothStrict.js']],
+  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,rawResult,result', './test/collateral/test/bothStrict.js']],
+  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result,rawResult', './test/collateral/test/bothStrict.js']],
+   [['--includesDir', './test/test-includes', '--transformer', path.join(__dirname, './transformer/spec.js'), '--reporter-keys', 'attrs,result,rawResult', './test/babel-collateral/test/spread-sngl-obj-ident.js']],
 ].reduce((accum, a) => {
   let b = a.slice();
 
@@ -27,8 +27,8 @@ const tests = [
     a.push({ reporter: 'json' });
     b.push({ reporter: 'simple' });
   } else {
-    Object.assign(a[1], { reporter: 'json' });
-    Object.assign(b[1], { reporter: 'simple' });
+    a[1] = Object.assign({}, a[1], { reporter: 'json' });
+    b[1] = Object.assign({}, b[1], { reporter: 'simple' });
   }
 
   accum.push(a, b);
