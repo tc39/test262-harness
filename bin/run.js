@@ -18,6 +18,7 @@ const ResultsEmitter = require('../lib/results-emitter.js');
 const cli = require('../lib/cli.js');
 const test262Finder = require('../lib/findTest262.js');
 const validator = require('../lib/validator.js');
+const getConditionals = require('../lib/conditional.js');
 
 const argv = cli.argv;
 
@@ -83,7 +84,6 @@ if (argv.prelude) {
 // If using default hostType, hostPath defaults to the current node executable location.
 let hostType;
 let hostPath;
-let features;
 
 if (argv.hostType) {
   hostType = argv.hostType;
@@ -116,13 +116,19 @@ if (argv.transformer || argv.transform) {
   transform = require(argv.transformer || argv.transform);
 }
 
+let features;
 if (argv.features) {
   features = argv.features.split(',').map(feature => feature.trim());
 }
 
+let conditionals;
+if (argv.conditional) {
+  conditionals = getConditionals(argv.conditional);
+}
+
 // Test Pipeline
 const pool = new AgentPool(
-  Number(argv.threads), hostType, argv.hostArgs, hostPath, { tempDir, timeout, transform }
+  Number(argv.threads), hostType, argv.hostArgs, hostPath, { tempDir, timeout, transform, conditionals }
 );
 
 if (!test262Dir) {
