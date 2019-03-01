@@ -21,6 +21,19 @@ const validator = require('../lib/validator.js');
 
 const argv = cli.argv;
 
+// Show help if no arguments provided
+if (!argv._.length) {
+  cli.showHelp();
+  process.exitCode = 1;
+  return;
+}
+
+// print version of test262-harness
+if (argv.version) {
+  printVersion();
+  return;
+}
+
 // test262 directory (used to locate includes unless overridden with includesDir)
 let test262Dir = argv.test262Dir;
 // where to load includes from (usually a subdirectory of test262dir)
@@ -28,12 +41,6 @@ let includesDir = argv.includesDir;
 
 let tempDir = argv.tempDir;
 let acceptVersion = argv.acceptVersion;
-
-// print version of test262-harness
-if (argv.version) {
-  printVersion();
-  return;
-}
 
 // initialize reporter by attempting to load lib/reporters/${reporter}
 // defaults to 'simple'
@@ -111,13 +118,6 @@ if (argv.transformer || argv.transform) {
 
 if (argv.features) {
   features = argv.features.split(',').map(feature => feature.trim());
-}
-
-// Show help if no arguments provided
-if (!argv._.length) {
-  cli.showHelp();
-  process.exitCode = 1;
-  return;
 }
 
 // Test Pipeline
