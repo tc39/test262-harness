@@ -104,9 +104,14 @@ if (hostType) {
 
 let timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
 let transform;
+let preprocessor;
 
 if (argv.transformer || argv.transform) {
   transform = require(argv.transformer || argv.transform);
+}
+
+if (argv.preprocessor) {
+  preprocessor = require(path.join(process.cwd(), argv.preprocessor));
 }
 
 if (argv.features) {
@@ -154,7 +159,11 @@ if (acceptVersion ? acceptVersion !== test262Version :
 
 const stream = new TestStream(test262Dir, includesDir, acceptVersion, argv._);
 
-const tests = stream.pipe(filter(hasFeatures)).pipe(map(insertPrelude));
+let tests = stream.pipe(filter(hasFeatures)).pipe(map(insertPrelude));
+
+if (preprocessor) {
+  tests = tests.pipe(filter(preprocessor));
+}
 
 const results = zip(pool, tests).pipe(
   flatMap(pair => {
