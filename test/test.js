@@ -19,7 +19,9 @@ const tests = [
   [['--includesDir', './test/test-includes', '--reporter-keys', 'rawResult,attrs,result', './test/collateral/test/bothStrict.js']],
   [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,rawResult,result', './test/collateral/test/bothStrict.js']],
   [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result,rawResult', './test/collateral/test/bothStrict.js']],
-   [['--includesDir', './test/test-includes', '--transformer', path.join(__dirname, './transformer/spec.js'), '--reporter-keys', 'attrs,result,rawResult', './test/babel-collateral/test/spread-sngl-obj-ident.js']],
+  [['--includesDir', './test/test-includes', '--transformer', path.join(__dirname, './transformer/spec.js'), '--reporter-keys', 'attrs,result,rawResult', './test/babel-collateral/test/spread-sngl-obj-ident.js']],
+  [['--includesDir', './test/test-includes', '--preprocessor', './test/preprocessor/spec.js', '--reporter-keys', 'attrs,result,rawResult', './test/collateral-preprocessor/test/spread-sngl-obj-ident.js']],
+  [['--includesDir', './test/test-includes', '--preprocessor', './test/preprocessor/autofail.js', '--reporter-keys', 'attrs,result,rawResult', './test/collateral-preprocessor/test/autofail.js']],
 ].reduce((accum, a) => {
   let b = a.slice();
 

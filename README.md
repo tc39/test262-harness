@@ -39,6 +39,34 @@ Run `test262-harness --help` for details on the various configuration options.
 | `--prelude` | Path to a file to include before every test (useful for testing polyfills for example); supports multiple `--prelude` parameters | No | n/a |
 | `--timeout` | Set a custom test timeout in milliseconds | No | `10000` |
 | `--transformer` | Path to module which exports a code transformer function | No | n/a |
+| `--preprocessor` | Path to module which exports a map function that operates on each Test262Test object before it executed. | No | n/a |
 | `--acceptVersion` | Execute tests from a version of Test262 that differs from the versions supported by this utility. This may cause the utility to report invalid test results. | No | Inferred from `test262Dir/package.json` |
 | `--saveCompiledTests` | Write the compiled version of `path/to/test.js` as `path/to/test.js.<hostType>.<default\|strict>.<pass\|fail>` so that it can be easily re-run under that host. Run `test262-harness --help` for examples. | No | n/a 
 | `--saveOnlyFailed` | Only save the compiled version of the test if it failed, to help easily repro failed tests (implies `--saveCompiledTests`). | No | n/a 
+
+### Preprocessor
+
+The `--preprocessor` feature allows patching a module that exports a map function that operates on each Test262Test object before their execution.
+
+Using the preprocessor feature, each Test262Test object can be returned with an added property `result` that sets an autofail mode. This will skip the code evaluation and report the given result object.
+
+This can be useful for code transforming and/or test filtering. e.g.:
+
+```js
+module.exports = function(test) {
+  try {
+    test.contents = babel.transform(test.contents, options).code;
+  } catch (error) {
+    test.result = {
+      stderr: 'Test262: This is a fake error.\n',
+      stdout: '',
+      error: {
+        name: 'Test262',
+        message: 'This is a fake error.'
+      }
+    };
+  }
+
+  return test;
+};
+```
