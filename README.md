@@ -46,11 +46,11 @@ Run `test262-harness --help` for details on the various configuration options.
 
 ### Preprocessor
 
-The `--preprocessor` feature allows patching a module that exports a map function that operates on each Test262Test object before their execution.
+The `--preprocessor` feature allows  a module that exports a map function that operates on each [Test262Test object](https://github.com/bocoup/test262-stream#usage) (ie. the object emitted by Test262-Stream) before their execution.
 
-Using the preprocessor feature, each Test262Test object can be returned with an added property `result` that sets an autofail mode. This will skip the code evaluation and report the given result object.
+#### `test.result = Result Object`
 
-This can be useful for code transforming and/or test filtering. e.g.:
+In some cases, a preprocessor may want to signal to Test262-Harness that a certain result has already been reached, and that it must not further evaluate the test. To create this signal, the preprocessor creates a [`result`](https://github.com/bterlson/eshost#result-object) property on the Test262Test object, which will indicate to Test262-Harness that it must not evaluate the test, but instead return the value of the [`result`](https://github.com/bterlson/eshost#result-object) property as though the test had been executed. For example, a preprocessor may attempt to transpile the value of `test.contents`—which may fail! In the case of failure, the preprocessor can create a [`result`](https://github.com/bterlson/eshost#result-object) property whose value is a [`Result Object`](https://github.com/bterlson/eshost#result-object). This will skip the code evaluation and report the given result object. 
 
 ```js
 module.exports = function(test) {
@@ -58,12 +58,9 @@ module.exports = function(test) {
     test.contents = babel.transform(test.contents, options).code;
   } catch (error) {
     test.result = {
-      stderr: 'Test262: This is a fake error.\n',
+      stderr: `${error.name}: ${error.message}\n`,
       stdout: '',
-      error: {
-        name: 'Test262',
-        message: 'This is a fake error.'
-      }
+      error
     };
   }
 
