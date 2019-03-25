@@ -107,7 +107,7 @@ let transform;
 let preprocessor;
 
 if (argv.transformer || argv.transform) {
-  transform = require(argv.transformer || argv.transform);
+  transform = require(path.join(process.cwd(), argv.transformer || argv.transform));
 }
 
 if (argv.preprocessor) {

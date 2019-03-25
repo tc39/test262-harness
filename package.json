@@ -8,10 +8,9 @@
     "test262-harness": "bin/run.js"
   },
   "scripts": {
-    "test": "node_modules/.bin/tap test/*.js"
+    "test": "node_modules/.bin/tap --no-esm -T test/*.js"
   },
   "dependencies": {
-    "chalk": "^2.4.2",
     "eshost": "^5.0.0",
     "minimatch": "^3.0.4",
     "rxjs": "^6.4.0",
@@ -27,8 +26,6 @@
     "test"
   ],
   "devDependencies": {
-    "@babel/core": "^7.4.0",
-    "@babel/preset-env": "^7.4.2",
     "rimraf": "^2.6.3",
     "tap": "^12.6.0"
   }

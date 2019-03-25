@@ -10,23 +10,23 @@ module.exports = function run(extraArgs, options) {
     let args = [
       '--hostType', 'node',
       '--hostPath', process.execPath,
-      '--timeout', '2000',
       ...[ '-r', options.reporter ],
     ].concat(extraArgs);
 
     const cwd = options && options.cwd;
-    const child = cp.fork(binPath, args, { cwd, silent: true });
+    const child = cp.spawn(binPath, args, { cwd, silent: true });
 
     child.stdout.on('data', data => { stdout += data });
     child.stderr.on('data', data => { stderr += data });
-    child.on('exit', () => {
+    child.on('close', () => {
       if (stderr) {
         return reject(new Error(`Got stderr: ${stderr.toString()}`));
       }
 
       try {
+
         let records = options.reporter === 'json' ?
-          JSON.parse(stdout) :
+          JSON.parse(stdout.trim()) :
           stdout.trim().split('\n');
 
         resolve({
@@ -35,7 +35,7 @@ module.exports = function run(extraArgs, options) {
           records,
         });
       } catch(e) {
-        reject(e);
+        reject(new Error(`Got stderr: ${e.toString()}`));
       }
     });
   });

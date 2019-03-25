@@ -1,27 +1,122 @@
 'use strict';
 
-const parseFile = require('test262-parser').parseFile;
 const run = require('./util/run');
 const tap = require('tap');
 const path = require('path');
 
 const tests = [
-  [['test/**/*.js'], { cwd: 'test/collateral-with-harness/test262' }],
-  [['--test262Dir', './test/collateral-with-harness/test262', './test/collateral-with-harness/test262/test/**/*.js']],
-  [['--test262Dir', './test/collateral-with-harness/test262', './test/collateral-with-harness/test262/test/**/*.js', './test/collateral-with-harness/loose-tests/*']],
-  [['--test262Dir', './collateral-with-harness/test262', 'collateral-with-harness/test262/test/**/*.js'], { cwd: 'test' }],
-  [['--includesDir', './test/test-includes', './test/collateral/test/**/*.js']],
-  [['test/collateral-with-harness/test262/test/**/*.js']],
-  [['--includesDir', './test-includes', 'collateral/test/**/*.js'], { cwd: 'test' }],
-  [['collateral-with-harness/test262/test/**/*.js'], { cwd: 'test' }],
-  [['--includesDir', './test/test-includes', '--prelude', './test/fixtures/prelude-a.js',  '--prelude', './test/fixtures/prelude-b.js', './test/collateral/test/bothStrict.js'], { prelude: true }],
-  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result', './test/collateral/test/bothStrict.js'], { noRawResult: true }],
-  [['--includesDir', './test/test-includes', '--reporter-keys', 'rawResult,attrs,result', './test/collateral/test/bothStrict.js']],
-  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,rawResult,result', './test/collateral/test/bothStrict.js']],
-  [['--includesDir', './test/test-includes', '--reporter-keys', 'attrs,result,rawResult', './test/collateral/test/bothStrict.js']],
-  [['--includesDir', './test/test-includes', '--transformer', path.join(__dirname, './transformer/spec.js'), '--reporter-keys', 'attrs,result,rawResult', './test/babel-collateral/test/spread-sngl-obj-ident.js']],
-  [['--includesDir', './test/test-includes', '--preprocessor', './test/preprocessor/spec.js', '--reporter-keys', 'attrs,result,rawResult', './test/collateral-preprocessor/test/spread-sngl-obj-ident.js']],
-  [['--includesDir', './test/test-includes', '--preprocessor', './test/preprocessor/autofail.js', '--reporter-keys', 'attrs,result,rawResult', './test/collateral-preprocessor/test/autofail.js']],
+  [
+    [
+      'test/**/*.js',
+    ],
+    { cwd: 'test/collateral-with-harness/test262' },
+  ],
+  [
+    [
+      '--test262Dir', './test/collateral-with-harness/test262',
+      './test/collateral-with-harness/test262/test/**/*.js',
+    ],
+  ],
+  [
+    [
+      '--test262Dir', './test/collateral-with-harness/test262',
+      './test/collateral-with-harness/test262/test/**/*.js',
+      './test/collateral-with-harness/loose-tests/*',
+    ],
+  ],
+  [
+    [
+      '--test262Dir', './collateral-with-harness/test262',
+      'collateral-with-harness/test262/test/**/*.js',
+    ],
+    { cwd: 'test' },
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      './test/collateral/test/**/*.js',
+    ],
+  ],
+  [
+    [
+      'test/collateral-with-harness/test262/test/**/*.js',
+    ],
+  ],
+  [
+    [
+      '--includesDir', './test-includes',
+      'collateral/test/**/*.js',
+    ],
+    { cwd: 'test' },
+  ],
+  [
+    [
+      'collateral-with-harness/test262/test/**/*.js',
+    ],
+    { cwd: 'test' },
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      '--prelude', './test/fixtures/prelude-a.js',
+      '--prelude', './test/fixtures/prelude-b.js',
+      './test/collateral/test/bothStrict.js',
+    ],
+    { prelude: true },
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      '--reporter-keys', 'attrs,result',
+      './test/collateral/test/bothStrict.js',
+    ],
+    { noRawResult: true },
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      '--reporter-keys', 'rawResult,attrs,result',
+      './test/collateral/test/bothStrict.js',
+    ],
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      '--reporter-keys', 'attrs,rawResult,result',
+      './test/collateral/test/bothStrict.js',
+    ],
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      '--reporter-keys', 'attrs,result,rawResult',
+      './test/collateral/test/bothStrict.js',
+    ],
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      '--transformer', './test/transformer/spec.js',
+      '--reporter-keys', 'attrs,result,rawResult',
+      './test/babel-collateral/test/spread-sngl-obj-ident.js',
+    ],
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      '--preprocessor', './test/preprocessor/spec.js',
+      '--reporter-keys', 'attrs,result,rawResult',
+      './test/collateral-preprocessor/test/spread-sngl-obj-ident.js',
+    ]
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      '--preprocessor', './test/preprocessor/autofail.js',
+      '--reporter-keys', 'attrs,result,rawResult',
+      './test/collateral-preprocessor/test/autofail.js',
+    ]
+  ],
 ].reduce((accum, a) => {
   let b = a.slice();
 
@@ -38,9 +133,8 @@ const tests = [
   return accum;
 }, []);
 
-
-
-Promise.all(tests.map(args => run(...args).then(validate)))
+Promise.all(tests.map(args => run(...args)))
+  .then(outcomes => outcomes.map(outcome => validate(outcome)))
   .catch(reportRunError);
 
 function reportRunError(error) {
@@ -50,8 +144,10 @@ function reportRunError(error) {
 }
 
 function validate({ args, records, options = { prelude: false } }) {
+
   if (options.reporter === 'json') {
     records.forEach(record => {
+
       const description = options.prelude ?
         `${record.attrs.description} with prelude` :
         record.attrs.description;
@@ -66,22 +162,29 @@ function validate({ args, records, options = { prelude: false } }) {
           }
         }
 
-        assert.notEqual(record.attrs.expected, undefined, 'Test has an "expected" frontmatter');
+        assert.notEqual(record.attrs.expected, undefined,
+                        'Test has an "expected" frontmatter');
+
         if (!record.attrs.expected) {
           // can't do anything else
           assert.end();
           return;
         }
 
-        assert.equal(record.result.pass, record.attrs.expected.pass, 'Test passes or fails as expected');
+        assert.equal(record.result.pass, record.attrs.expected.pass,
+                      'Test passes or fails as expected');
 
         if (record.attrs.expected.message) {
-          assert.equal(record.result.message, record.attrs.expected.message, 'Test fails with appropriate message');
+          assert.equal(record.result.message, record.attrs.expected.message,
+                      'Test fails with appropriate message');
         }
 
         if (options.prelude) {
-          assert.ok(record.rawResult.stdout.includes('prelude a!'), 'Has prelude-a content');
-          assert.ok(record.rawResult.stdout.includes('prelude b!'), 'Has prelude-b content');
+          assert.ok(record.rawResult.stdout.includes('prelude a!'),
+                    'Has prelude-a content');
+
+          assert.ok(record.rawResult.stdout.includes('prelude b!'),
+                    'Has prelude-b content');
         }
 
         if (options.noRawResult) {
@@ -104,7 +207,7 @@ function validate({ args, records, options = { prelude: false } }) {
       const fail = stdouts.filter(out => out.startsWith('FAIL')).length;
       const [report, passed, failed] = captured;
 
-      assert.equal(report, `Ran ${pass + fail} tests`);
+      assert.equal(report.trim(), `Ran ${pass + fail} tests`);
       assert.equal(passed, `${pass} passed`);
       assert.equal(failed, `${fail} failed`);
       assert.end();
