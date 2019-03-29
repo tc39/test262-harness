@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "chalk": "^2.4.2",
-    "eshost": "^4.7.1",
+    "eshost": "^5.0.0",
     "minimatch": "^3.0.4",
     "rxjs": "^6.4.0",
     "test262-stream": "^1.2.0",
