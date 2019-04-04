@@ -1,3 +1,5 @@
+// Copyright (C) 2048 $ContributorName. All rights reserved.
+// This code is governed by the BSD license found in the LICENSE file.
 /*---
 description: Should test in both modes
 negative:
