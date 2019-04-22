@@ -3,7 +3,7 @@
 // Copyright (C) 2014, Microsoft Corporation. All rights reserved.
 // This code is governed by the BSD License found in the LICENSE file.
 const DEFAULT_TEST_TIMEOUT = 10000;
-const ACCEPTED_TEST262_VERSIONS = /^[1-3]\./
+const ACCEPTED_TEST262_VERSIONS = /^[1-4]\./
 
 const fs = require('fs');
 const path = require('path');

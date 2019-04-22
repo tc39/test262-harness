@@ -13,7 +13,7 @@ tap.test('unsupported version without `acceptVersion`', assert => {
 });
 
 tap.test('supported version with matching `acceptVersion`', assert => {
-  run(['test/collateral-supported-version/test/**/*.js',  '--acceptVersion', '3.0.0'], {reporter})
+  run(['test/collateral-supported-version/test/**/*.js',  '--acceptVersion', '4.0.0'], {reporter})
     .catch(assert.fail)
     .then(assert.done);
 });
