@@ -144,7 +144,7 @@ try {
     fs.readFileSync(path.join(test262Dir, 'package.json'))
   ).version;
 } catch (err) {
-  console.error('Unable to detect version of test262: ' + err);
+  console.error(`Unable to detect version of test262: ${err}`);
   process.exitCode = 1;
   return;
 }
@@ -152,7 +152,7 @@ try {
 if (acceptVersion ? acceptVersion !== test262Version :
   !ACCEPTED_TEST262_VERSIONS.test(test262Version)) {
 
-  console.error('Incompatible test262 version: ' + test262Version);
+  console.error(`Incompatible test262 version: ${test262Version}`);
   process.exitCode = 1;
   return;
 }
