@@ -102,15 +102,21 @@ if (hostType) {
 }
 
 let timeout = argv.timeout || DEFAULT_TEST_TIMEOUT;
-let transform;
+let transform, transformer;
 let preprocessor;
 
-if (argv.transformer || argv.transform) {
-  transform = require(path.join(process.cwd(), argv.transformer || argv.transform));
+if (argv.transformer) {
+  const transformerPath = path.isAbsolute(argv.transformer) ?
+    argv.transformer : path.join(process.cwd(), argv.transformer)
+
+  transform = transformer = require(transformerPath);
 }
 
 if (argv.preprocessor) {
-  preprocessor = require(path.join(process.cwd(), argv.preprocessor));
+  const preprocessorPath = path.isAbsolute(argv.preprocessor) ?
+    argv.preprocessor : path.join(process.cwd(), argv.preprocessor)
+
+  preprocessor = require(preprocessorPath);
 }
 
 if (argv.features) {
