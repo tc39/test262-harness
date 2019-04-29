@@ -3,7 +3,6 @@
 // Copyright (C) 2014, Microsoft Corporation. All rights reserved.
 // This code is governed by the BSD License found in the LICENSE file.
 const DEFAULT_TEST_TIMEOUT = 10000;
-const ACCEPTED_TEST262_VERSIONS = /^[1-4]\./
 
 const fs = require('fs');
 const path = require('path');
@@ -149,12 +148,8 @@ try {
   return;
 }
 
-if (acceptVersion ? acceptVersion !== test262Version :
-  !ACCEPTED_TEST262_VERSIONS.test(test262Version)) {
-
-  console.error(`Incompatible test262 version: ${test262Version}`);
-  process.exitCode = 1;
-  return;
+if (!acceptVersion) {
+  acceptVersion = test262Version;
 }
 
 const stream = new TestStream(test262Dir, includesDir, acceptVersion, argv._);
