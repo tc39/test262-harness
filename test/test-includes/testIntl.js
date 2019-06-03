@@ -20,7 +20,7 @@ author: Norbert Lindenberg
  *   @param {Function} Constructor the constructor object to test with.
  */
 function testWithIntlConstructors(f) {
-  var constructors = ["Collator", "NumberFormat", "DateTimeFormat"];
+  var constructors = ["Collator", "NumberFormat", "DateTimeFormat", "RelativeTimeFormat"];
 
   // Optionally supported Intl constructors.
   ["PluralRules"].forEach(function(constructor) {
