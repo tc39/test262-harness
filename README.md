@@ -4,16 +4,16 @@
 
 ## Test Authoring Quick Start
 
-1. Clone **test262** locally:
+- For development of Test262-harness, test authoring & execution: clone **test262** locally:
     ```
     git clone https://github.com/tc39/test262.git --depth 1
     cd test262
     ```
-2. Install **test262-harness**: 
+- For development of test authoring & execution: install **test262-harness**: 
     ```
     npm install -g test262-harness
     ```
-3. Run some tests!
+- Run some tests!
     ```
     test262-harness test/**/*.js
     ```
