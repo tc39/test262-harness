@@ -1,24 +1,38 @@
-## Test262-Harness
+# Test262-Harness
 
 [![Travis Build Status](https://travis-ci.org/bterlson/test262-harness.svg?branch=master)](https://travis-ci.org/bterlson/test262-harness)
 
-## Test Authoring Quick Start
+## Getting Started
 
-- For development of Test262-harness, test authoring & execution: clone **test262** locally:
-    ```
-    git clone https://github.com/tc39/test262.git --depth 1
-    cd test262
-    ```
-- For development of test authoring & execution: install **test262-harness**: 
-    ```
-    npm install -g test262-harness
-    ```
-- Run some tests!
-    ```
-    test262-harness test/**/*.js
-    ```
+### For Development of Test262-Harness
+
+For development of Test262-harness, test authoring & execution:
+
+```
+git clone https://github.com/tc39/test262.git --depth 1
+cd test262
+```
+
+### For Test Authoring & Test Execution: 
+
+For test authoring & execution:
+```
+npm install -g test262-harness
+```
 
 Run `test262-harness --help` for details on the various configuration options.
+
+### Examples
+
+Running tests in hypothetical JavaScript engine "X": 
+
+```
+cd test262;
+test262-harness --hostType=X --hostPath=`which X` test/**/*.js
+```
+
+
+
 
 ## Options
 
@@ -43,6 +57,7 @@ Run `test262-harness --help` for details on the various configuration options.
 | `--acceptVersion` | Execute tests from a version of Test262 that differs from the versions supported by this utility. This may cause the utility to report invalid test results. | No | Inferred from `test262Dir/package.json` |
 | `--saveCompiledTests` | Write the compiled version of `path/to/test.js` as `path/to/test.js.<hostType>.<default\|strict>.<pass\|fail>` so that it can be easily re-run under that host. Run `test262-harness --help` for examples. | No | n/a 
 | `--saveOnlyFailed` | Only save the compiled version of the test if it failed, to help easily repro failed tests (implies `--saveCompiledTests`). | No | n/a 
+
 
 ### Preprocessor
 
