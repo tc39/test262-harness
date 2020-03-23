@@ -5,10 +5,16 @@ const path = require('path');
 const tap = require('tap');
 
 const sameMembers = (assert, actual, expected) => {
-  const expectedSet = expected.map((expectedMember) => {
-    return expectedMember.split('/').join(path.sep);
-  });
-  assert.equal(actual.length, expected.length);
+  const expectedSet = expected.map((expectedMember) => path.normalize(expectedMember));
+  assert.equal(actual.length, expected.length, `
+    Expected:
+
+      ${actual}
+
+    to have the same length as:
+
+      ${expected}
+  `);
 
   for (let actualMember of actual) {
     assert.assert(expectedSet.includes(actualMember), actualMember);
@@ -97,6 +103,30 @@ tap.test('file matching: file names (siblings)', assert => {
       const expectedRelPaths = [
         'evens/2.js',
         'evens/42.js'
+      ];
+      sameMembers(assert, relativePaths, expectedRelPaths);
+    }).then(assert.done, assert.fail);
+});
+
+tap.test('file matching: directories with name overlap', assert => {
+  run([
+      'test/collateral-nested-similar-names/test/get/index.js',
+      'test/collateral-nested-similar-names/test/getOwnPropertyDescriptor/index.js',
+      'test/collateral-nested-similar-names/test/getPrototypeOf/index.js',
+    ])
+    .then((results) => {
+      const files = results.map((result) => result.file);
+      const relativePaths = results.map((result) => result.relative);
+      const expectedFiles = [
+        'test/collateral-nested-similar-names/test/get/index.js',
+        'test/collateral-nested-similar-names/test/getOwnPropertyDescriptor/index.js',
+        'test/collateral-nested-similar-names/test/getPrototypeOf/index.js',
+      ];
+      sameMembers(assert, files, expectedFiles);
+      const expectedRelPaths = [
+        'get/index.js',
+        'getOwnPropertyDescriptor/index.js',
+        'getPrototypeOf/index.js',
       ];
       sameMembers(assert, relativePaths, expectedRelPaths);
     }).then(assert.done, assert.fail);
