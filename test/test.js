@@ -36,7 +36,6 @@ const tests = [
       '--includesDir', './test/test-includes',
       './test/collateral/test/**/*.js',
     ],
-    { exitCode: 1 },
   ],
   [
     [
@@ -48,7 +47,7 @@ const tests = [
       '--includesDir', './test-includes',
       'collateral/test/**/*.js',
     ],
-    { cwd: 'test', exitCode: 1 },
+    { cwd: 'test' },
   ],
   [
     [
@@ -117,7 +116,6 @@ const tests = [
       '--reporter-keys', 'attrs,result,rawResult',
       './test/collateral-preprocessor/test/autofail.js',
     ],
-    { exitCode: 1 },
   ],
 ].reduce((accum, a) => {
   let b = a.slice();
