@@ -36,6 +36,7 @@ const tests = [
       '--includesDir', './test/test-includes',
       './test/collateral/test/**/*.js',
     ],
+    { exitCode: 1 },
   ],
   [
     [
@@ -47,7 +48,7 @@ const tests = [
       '--includesDir', './test-includes',
       'collateral/test/**/*.js',
     ],
-    { cwd: 'test' },
+    { cwd: 'test', exitCode: 1 },
   ],
   [
     [
@@ -115,7 +116,8 @@ const tests = [
       '--preprocessor', './test/preprocessor/autofail.js',
       '--reporter-keys', 'attrs,result,rawResult',
       './test/collateral-preprocessor/test/autofail.js',
-    ]
+    ],
+    { exitCode: 1 },
   ],
 ].reduce((accum, a) => {
   let b = a.slice();
@@ -143,12 +145,17 @@ function reportRunError(error) {
   process.exit(1);
 }
 
-function validate({ args, records, options = { prelude: false } }) {
+function validate({ args, records, exitCode, options }) {
+  tap.test(`exit code with args \`${args.join(' ')}\``, assert => {
+    const expectedExitCode = options && options.exitCode || 0;
+    assert.equal(exitCode, expectedExitCode, 'exited with correct code');
+    assert.end();
+  });
 
   if (options.reporter === 'json') {
     records.forEach(record => {
-
-      const description = options.prelude ?
+      const prelude = options && options.prelude;
+      const description = prelude ?
         `${record.attrs.description} with prelude` :
         record.attrs.description;
 
@@ -179,7 +186,7 @@ function validate({ args, records, options = { prelude: false } }) {
                       'Test fails with appropriate message');
         }
 
-        if (options.prelude) {
+        if (prelude) {
           assert.ok(record.rawResult.stdout.includes('prelude a!'),
                     'Has prelude-a content');
 
