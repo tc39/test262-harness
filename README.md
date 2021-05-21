@@ -57,6 +57,7 @@ test262-harness --hostType=X --hostPath=`which X` test/**/*.js
 | `--acceptVersion` | Execute tests from a version of Test262 that differs from the versions supported by this utility. This may cause the utility to report invalid test results. | No | Inferred from `test262Dir/package.json` |
 | `--saveCompiledTests` | Write the compiled version of `path/to/test.js` as `path/to/test.js.<hostType>.<default\|strict>.<pass\|fail>` so that it can be easily re-run under that host. Run `test262-harness --help` for examples. | No | n/a 
 | `--saveOnlyFailed` | Only save the compiled version of the test if it failed, to help easily repro failed tests (implies `--saveCompiledTests`). | No | n/a 
+| `--errorForFailures` | Return a non-zero exit code if one or more tests fail. | No | n/a
 
 
 ### Preprocessor

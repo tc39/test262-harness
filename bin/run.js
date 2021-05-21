@@ -178,6 +178,13 @@ const results = zip(pool, tests).pipe(
 );
 
 const emitter = new ResultsEmitter(results);
+
+if (argv.errorForFailures) {
+  emitter.on('fail', function () {
+    process.exitCode = 1;
+  });
+}
+
 reporter(emitter, reporterOpts);
 
 function printVersion() {

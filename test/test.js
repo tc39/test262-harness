@@ -13,6 +13,12 @@ const tests = [
   ],
   [
     [
+      'test/**/*.js', '--error-for-failures',
+    ],
+    { cwd: 'test/collateral-with-harness/test262' },
+  ],
+  [
+    [
       '--test262Dir', './test/collateral-with-harness/test262',
       './test/collateral-with-harness/test262/test/**/*.js',
     ],
@@ -116,6 +122,16 @@ const tests = [
       '--reporter-keys', 'attrs,result,rawResult',
       './test/collateral-preprocessor/test/autofail.js',
     ],
+  ],
+  [
+    [
+      '--includesDir', './test/test-includes',
+      '--preprocessor', './test/preprocessor/autofail.js',
+      '--reporter-keys', 'attrs,result,rawResult',
+      './test/collateral-preprocessor/test/autofail.js',
+      '--errorForFailures',
+    ],
+    { exitCode: 1 },
   ],
 ].reduce((accum, a) => {
   let b = a.slice();
