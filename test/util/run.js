@@ -32,6 +32,7 @@ module.exports = function run(extraArgs, options) {
         resolve({
           args,
           options,
+          exitCode: child.exitCode,
           records,
         });
       } catch(e) {
