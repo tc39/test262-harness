@@ -138,28 +138,28 @@ const tests = [
       '--features-include=A',
       'collateral/test/**/*.js',
     ],
-    { cwd: 'test', recordsCount: 6 },
+    { cwd: 'test', recordsCount: 7 },
   ],
   [
     [
       '--features-exclude=B',
       'collateral/test/**/*.js',
     ],
-    { cwd: 'test', recordsCount: 14 },
+    { cwd: 'test', recordsCount: 13 },
   ],
   [
     [
       '--features-include=A,B',
       'collateral/test/**/*.js',
     ],
-    { cwd: 'test', recordsCount: 8 },
+    { cwd: 'test', recordsCount: 9 },
   ],
   [
     [
       '--features-exclude=A,B',
       'collateral/test/**/*.js',
     ],
-    { cwd: 'test', recordsCount: 16 },
+    { cwd: 'test', recordsCount: 9 },
   ],
   [
     [
@@ -168,6 +168,14 @@ const tests = [
       'collateral/test/**/*.js',
     ],
     { cwd: 'test', recordsCount: 4 },
+  ],
+  [
+    [
+      '--features-include=A,B,C',
+      '--features-exclude=C',
+      'collateral/test/**/*.js',
+    ],
+    { cwd: 'test', recordsCount: 6 },
   ],
 ].reduce((accum, a) => {
   let b = a.slice();
@@ -204,7 +212,7 @@ function validate({ args, records, exitCode, options }) {
 
   if (options.reporter === 'json') {
     if (options.recordsCount) {
-      tap.test('--features-include/exclude', assert => {
+      tap.test(`\`${args.join(' ')}\`: ${options.recordsCount} test records found`, assert => {
         assert.equal(records.length, options.recordsCount, 'records.length matches expected records count');
         assert.end();
       });

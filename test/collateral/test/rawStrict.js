@@ -3,6 +3,7 @@ description: Should not test in strict mode (but allow strict mode to be enabled
 flags: [raw]
 expected:
   pass: true
+features: [C]
 ---*/
 'use strict';
 var seemsStrict;

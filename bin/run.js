@@ -217,12 +217,12 @@ function filterByFeatureInclude(test) {
   if (!featuresInclude) {
     return true;
   }
-  return featuresInclude.filter(feature => (test.attrs.features || []).includes(feature)).length > 0;
+  return featuresInclude.some(feature => (test.attrs.features || []).includes(feature));
 }
 
 function filterByFeatureExclude(test) {
   if (!featuresExclude) {
     return true;
   }
-  return featuresExclude.filter(feature => !(test.attrs.features || []).includes(feature)).length > 0;
+  return !featuresExclude.some(feature => (test.attrs.features || []).includes(feature));
 }
