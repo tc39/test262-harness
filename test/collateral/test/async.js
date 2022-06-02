@@ -2,6 +2,7 @@
 description: Async test
 expected:
   pass: true
+features: [A]
 flags: [async]
 ---*/
 

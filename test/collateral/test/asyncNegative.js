@@ -5,6 +5,7 @@ negative:
   type: RangeError
 expected:
   pass: true
+features: [A,B]
 flags: [async]
 ---*/
 

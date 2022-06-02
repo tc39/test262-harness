@@ -7,6 +7,7 @@ negative:
   type: ReferenceError
 expected:
   pass: true
+features: [A]
 ---*/
 var strict;
 try { x = 1; strict = false;} catch(e) { strict = true }

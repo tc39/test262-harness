@@ -75,7 +75,8 @@ if (argv.prelude) {
 // If using default hostType, hostPath defaults to the current node executable location.
 let hostType;
 let hostPath;
-let features;
+let featuresInclude;
+let featuresExclude;
 
 if (argv.hostType) {
   hostType = argv.hostType;
@@ -119,8 +120,12 @@ if (argv.preprocessor) {
   preprocessor = require(preprocessorPath);
 }
 
-if (argv.features) {
-  features = argv.features.split(',').map(feature => feature.trim());
+if (argv.features || argv.featuresInclude) {
+  featuresInclude = (argv.features || argv.featuresInclude).split(',').map(feature => feature.trim());
+}
+
+if (argv.featuresExclude) {
+  featuresExclude = argv.featuresExclude.split(',').map(feature => feature.trim());
 }
 
 // Show help if no arguments provided
@@ -141,6 +146,7 @@ if (!test262Dir) {
 reporterOpts.test262Dir = test262Dir;
 
 const remove = path.relative(process.cwd(), test262Dir);
+
 argv._ = argv._.map(p => path.relative(remove, p));
 
 let test262Version;
@@ -160,7 +166,7 @@ if (!acceptVersion) {
 
 const stream = new TestStream(test262Dir, includesDir, acceptVersion, argv._);
 
-let tests = stream.pipe(filter(hasFeatures)).pipe(map(insertPrelude));
+let tests = stream.pipe(filter(filterByFeatureInclude)).pipe(filter(filterByFeatureExclude)).pipe(map(insertPrelude));
 
 if (preprocessor) {
   tests = tests.pipe(filter(preprocessor));
@@ -207,9 +213,16 @@ function insertPrelude(test) {
   return test;
 }
 
-function hasFeatures(test) {
-  if (!features) {
+function filterByFeatureInclude(test) {
+  if (!featuresInclude) {
     return true;
   }
-  return features.filter(feature => (test.attrs.features || []).includes(feature)).length > 0;
+  return featuresInclude.filter(feature => (test.attrs.features || []).includes(feature)).length > 0;
+}
+
+function filterByFeatureExclude(test) {
+  if (!featuresExclude) {
+    return true;
+  }
+  return featuresExclude.filter(feature => !(test.attrs.features || []).includes(feature)).length > 0;
 }

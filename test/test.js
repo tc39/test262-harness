@@ -133,6 +133,42 @@ const tests = [
     ],
     { exitCode: 1 },
   ],
+  [
+    [
+      '--features-include=A',
+      'collateral/test/**/*.js',
+    ],
+    { cwd: 'test', recordsCount: 6 },
+  ],
+  [
+    [
+      '--features-exclude=B',
+      'collateral/test/**/*.js',
+    ],
+    { cwd: 'test', recordsCount: 14 },
+  ],
+  [
+    [
+      '--features-include=A,B',
+      'collateral/test/**/*.js',
+    ],
+    { cwd: 'test', recordsCount: 8 },
+  ],
+  [
+    [
+      '--features-exclude=A,B',
+      'collateral/test/**/*.js',
+    ],
+    { cwd: 'test', recordsCount: 16 },
+  ],
+  [
+    [
+      '--features-include=A',
+      '--features-exclude=B',
+      'collateral/test/**/*.js',
+    ],
+    { cwd: 'test', recordsCount: 4 },
+  ],
 ].reduce((accum, a) => {
   let b = a.slice();
 
@@ -167,56 +203,63 @@ function validate({ args, records, exitCode, options }) {
   });
 
   if (options.reporter === 'json') {
-    records.forEach(record => {
-      const prelude = options && options.prelude;
-      const description = prelude ?
-        `${record.attrs.description} with prelude` :
-        record.attrs.description;
-
-      tap.test(description, assert => {
-
-        if (typeof record.scenario !== 'undefined') {
-          if (record.contents.startsWith('"use strict"')) {
-            assert.equal(record.scenario, 'strict mode');
-          } else {
-            assert.equal(record.scenario, 'default');
-          }
-        }
-
-        assert.notEqual(record.attrs.expected, undefined,
-                        'Test has an "expected" frontmatter');
-
-        if (!record.attrs.expected) {
-          // can't do anything else
-          assert.end();
-          return;
-        }
-
-        assert.equal(record.result.pass, record.attrs.expected.pass,
-                      'Test passes or fails as expected');
-
-        if (record.attrs.expected.message) {
-          assert.equal(record.result.message, record.attrs.expected.message,
-                      'Test fails with appropriate message');
-        }
-
-        if (prelude) {
-          assert.ok(record.rawResult.stdout.includes('prelude a!'),
-                    'Has prelude-a content');
-
-          assert.ok(record.rawResult.stdout.includes('prelude b!'),
-                    'Has prelude-b content');
-        }
-
-        if (options.noRawResult) {
-          assert.equal(record.rawResult, undefined);
-        } else {
-          assert.equal(typeof record.rawResult, 'object');
-        }
-
+    if (options.recordsCount) {
+      tap.test('--features-include/exclude', assert => {
+        assert.equal(records.length, options.recordsCount, 'records.length matches expected records count');
         assert.end();
       });
-    });
+    } else {
+      records.forEach(record => {
+        const prelude = options && options.prelude;
+        const description = prelude ?
+          `${record.attrs.description} with prelude` :
+          record.attrs.description;
+
+        tap.test(description, assert => {
+
+          if (typeof record.scenario !== 'undefined') {
+            if (record.contents.startsWith('"use strict"')) {
+              assert.equal(record.scenario, 'strict mode');
+            } else {
+              assert.equal(record.scenario, 'default');
+            }
+          }
+
+          assert.notEqual(record.attrs.expected, undefined,
+                          'Test has an "expected" frontmatter');
+
+          if (!record.attrs.expected) {
+            // can't do anything else
+            assert.end();
+            return;
+          }
+
+          assert.equal(record.result.pass, record.attrs.expected.pass,
+                        'Test passes or fails as expected');
+
+          if (record.attrs.expected.message) {
+            assert.equal(record.result.message, record.attrs.expected.message,
+                        'Test fails with appropriate message');
+          }
+
+          if (prelude) {
+            assert.ok(record.rawResult.stdout.includes('prelude a!'),
+                      'Has prelude-a content');
+
+            assert.ok(record.rawResult.stdout.includes('prelude b!'),
+                      'Has prelude-b content');
+          }
+
+          if (options.noRawResult) {
+            assert.equal(record.rawResult, undefined);
+          } else {
+            assert.equal(typeof record.rawResult, 'object');
+          }
+
+          assert.end();
+        });
+      });
+    }
   }
 
   if (options.reporter === 'simple') {
